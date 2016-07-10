@@ -2,10 +2,7 @@ package com.productiveengine.myl.UIL;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -20,16 +17,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.productiveengine.myl.Common.RequestCodes;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+
+import ar.com.daidalos.afiledialog.FileChooserActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,28 +43,40 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private static int ACTIVITY_CHOOSE_FILE = 1;
     public void onRootFolderClicked(View v){
-
-
-           // Intent pickRootFolderIntent = new Intent(this, FileChooserActivity.class);
-            //startActivityForResult(pickRootFolderIntent, RequestCodes.CHOOSE_FILE);
-
+           //Intent pickRootFolderIntent = new Intent(this, FileChooserActivity.class);
+           //startActivityForResult(pickRootFolderIntent, RequestCodes.CHOOSE_FILE);
+        Intent intent = new Intent(this, FileChooserActivity.class);
+        intent.putExtra(FileChooserActivity.INPUT_FOLDER_MODE, true);
+        this.startActivityForResult(intent, RequestCodes.CHOOSE_FILE);
     }
     //----------------------------------------------------------
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // If the request went well (OK) and the request was PICK_CONTACT_REQUEST
-       // if (resultCode == Activity.RESULT_OK && requestCode == RequestCodes.CHOOSE_FILE) {
-            /*
-            // Perform a query to the contact's content provider for the contact's name
-            Cursor cursor = getContentResolver().query(data.getData(),
-                    new String[] {Contacts.DISPLAY_NAME}, null, null, null);
-            if (cursor.moveToFirst()) { // True if the cursor is not empty
-                int columnIndex = cursor.getColumnIndex(Contacts.DISPLAY_NAME);
-                String name = cursor.getString(columnIndex);
-                // Do something with the selected contact's name...
+        //If the request went well (OK) and the request was PICK_CONTACT_REQUEST
+        if (resultCode == Activity.RESULT_OK && requestCode == RequestCodes.CHOOSE_FILE) {
+            boolean fileCreated = false;
+            String filePath = "";
+
+            Bundle bundle = data.getExtras();
+            if(bundle != null)
+            {
+                if(bundle.containsKey(FileChooserActivity.OUTPUT_NEW_FILE_NAME)) {
+                    fileCreated = true;
+                    File folder = (File) bundle.get(FileChooserActivity.OUTPUT_FILE_OBJECT);
+                    String name = bundle.getString(FileChooserActivity.OUTPUT_NEW_FILE_NAME);
+                    filePath = folder.getAbsolutePath() + "/" + name;
+                } else {
+                    fileCreated = false;
+                    File file = (File) bundle.get(FileChooserActivity.OUTPUT_FILE_OBJECT);
+                    filePath = file.getAbsolutePath();
+                }
             }
-            */
-       // }
+
+            String message = fileCreated? "File created" : "File opened";
+            message += ": " + filePath;
+            Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
+            toast.show();
+        }
     }
     //----------------------------------------------------------
     @Override

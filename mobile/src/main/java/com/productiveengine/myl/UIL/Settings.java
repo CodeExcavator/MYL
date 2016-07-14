@@ -4,11 +4,14 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
+
+import com.productiveengine.myl.UIL.databinding.FragmentSettingsBinding;
+import com.productiveengine.myl.ViewModels.SettingsVM;
 
 
 /**
@@ -68,9 +71,13 @@ public class Settings extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = (ViewGroup)inflater.inflate(R.layout.fragment_settings, container, false);
+        //View rootView = (ViewGroup)inflater.inflate(R.layout.fragment_settings, container, false);
+        FragmentSettingsBinding binding =
+                FragmentSettingsBinding.inflate(inflater, container, false);
 
-        return rootView;
+        SettingsVM settings = new SettingsVM();
+        binding.setSettingsVM(settings);
+        return binding.getRoot();
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -99,7 +106,7 @@ public class Settings extends Fragment {
 
     /**
      * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
+     * fragment to allow an interaction in th;is fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
      * <p/>
@@ -113,5 +120,18 @@ public class Settings extends Fragment {
     }
 
 
+    public static class Listeners implements View.OnClickListener{
+
+        private FragmentSettingsBinding binding;
+        public Listeners(FragmentSettingsBinding binding){
+            this.binding = binding;
+        }
+
+        @Override
+        public void onClick(View v){
+            Toast.makeText(v.getContext(), "Button pressed", Toast.LENGTH_SHORT).show();
+        }
+
+    }
 
 }

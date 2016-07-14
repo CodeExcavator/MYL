@@ -20,6 +20,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.productiveengine.myl.Common.RequestCodes;
+import com.productiveengine.myl.UIL.databinding.FragmentSettingsBinding;
+import com.productiveengine.myl.ViewModels.SettingsVM;
 
 import java.io.File;
 
@@ -165,7 +167,14 @@ public class MainActivity extends AppCompatActivity {
             View rootView = null;
 
             if(index == 0){
-                rootView = inflater.inflate(R.layout.fragment_settings, container, false);
+                //rootView = inflater.inflate(R.layout.fragment_settings, container, false);
+                FragmentSettingsBinding binding =
+                        FragmentSettingsBinding.inflate(inflater, container, false);
+
+                SettingsVM settings = new SettingsVM();
+                binding.setSettingsVM(settings);
+                binding.setListeners(new Settings.Listeners(binding));
+                rootView = binding.getRoot();
             }
             else if(index == 1){
                 rootView = inflater.inflate(R.layout.fragment_play, container, false);

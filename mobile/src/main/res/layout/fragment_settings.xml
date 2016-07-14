@@ -1,10 +1,19 @@
+<layout>
+    <data>
+        <variable
+            name="settingsVM"
+            type="com.productiveengine.myl.ViewModels.SettingsVM"/>
+        <variable
+            name="listeners"
+            type="com.productiveengine.myl.UIL.Settings.Listeners"
+            />
+    </data>
+
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.productiveengine.myl.UIL.Settings">
-
-
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -32,5 +41,34 @@
             android:text="Small Text"
             android:id="@+id/lblRootFolder" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@{settingsVM.firstName}"
+            android:id="@+id/firstname" />
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="..."
+            android:id="@+id/cmdTargetFolder"
+            android:onClick="@{listeners}"
+            />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:text="@={settingsVM.firstName}"
+            android:ems="10"
+            android:id="@+id/editText" />
+
+        <!--
+                <include layout="@layout/include_view"
+                    bind:dataSource="@{dataSource}">
+                </include>
+                -->
     </LinearLayout>
 </FrameLayout>
+</layout>

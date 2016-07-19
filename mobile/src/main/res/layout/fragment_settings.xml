@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Root folder"
-            android:id="@+id/rootFolderlbl" />
+            android:id="@+id/lblRootFolder" />
         <Button
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
@@ -38,15 +38,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Small Text"
-            android:id="@+id/lblRootFolder" />
-
+            android:text="@{settingsVM.rootFolderPath}"
+            android:id="@+id/lblRootFolderPath" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@{settingsVM.firstName}"
-            android:id="@+id/firstname" />
+            android:text="Target folder"
+            android:id="@+id/lblTargetFolder" />
         <Button
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
@@ -55,7 +54,56 @@
             android:id="@+id/cmdTargetFolder"
             android:onClick="@{listeners}"
             />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@{settingsVM.rootFolderPath}"
+            android:id="@+id/lblTargetFolderPath" />
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
 
+            <!--   -->
+            <RadioButton
+                android:id="@+id/btnTimeLimit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text= "@string/timeLimit"
+                android:checked="true"
+                />
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:text="@={`` + settingsVM.timeLimit}"
+                    android:ems="10"
+                    android:id="@+id/editText" />
+            <!--   -->
+            <RadioButton
+                android:id="@+id/btnPercentage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/timePercentage" />
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:text="@={`` + settingsVM.timePercentage}"
+                    android:ems="10"
+                    android:id="@+id/txtTimePercentage" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@{`` + settingsVM.timePercentage}"
+                    android:id="@+id/lblPercentageSymbolaa" />
+
+        </RadioGroup>
+
+        <!--
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -64,11 +112,13 @@
             android:ems="10"
             android:id="@+id/editText" />
 
-        <!--
+
                 <include layout="@layout/include_view"
                     bind:dataSource="@{dataSource}">
                 </include>
                 -->
     </LinearLayout>
+
 </FrameLayout>
+
 </layout>

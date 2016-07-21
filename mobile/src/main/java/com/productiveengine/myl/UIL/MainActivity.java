@@ -70,7 +70,8 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     fileCreated = false;
                     File file = (File) bundle.get(FileChooserActivity.OUTPUT_FILE_OBJECT);
-                    filePath = file.getAbsolutePath();
+                    filePath = file.getName();
+
                 }
             }
 
@@ -173,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
 
                 SettingsVM settings = new SettingsVM();
                 binding.setSettingsVM(settings);
-                binding.setListeners(new Settings.Listeners(binding));
+                //binding.setListeners(new Settings.Listeners(binding));
                 rootView = binding.getRoot();
             }
             else if(index == 1){

@@ -45,14 +45,15 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Target folder"
-            android:id="@+id/lblTargetFolder" />
+            android:id="@+id/lblTargetFolder"
+            />
         <Button
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="..."
             android:id="@+id/cmdTargetFolder"
-            android:onClick="@{listeners}"
+            android:onClick="@{settingsVM::onClickFriend}"
             />
         <TextView
             android:layout_width="wrap_content"

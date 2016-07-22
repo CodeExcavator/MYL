@@ -17,6 +17,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.productiveengine.myl.Common.RequestCodes;
@@ -28,6 +30,9 @@ import java.io.File;
 import ar.com.daidalos.afiledialog.FileChooserActivity;
 
 public class MainActivity extends AppCompatActivity {
+
+    //final TextView lblRootFolderPath = (TextView) findViewById(R.id.lblRootFolderPath);
+    //final TextView lblTargetFolderPath = (TextView) findViewById(R.id.lblTargetFolderPath);
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -43,42 +48,34 @@ public class MainActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-    private static int ACTIVITY_CHOOSE_FILE = 1;
-    public void onRootFolderClicked(View v){
-           //Intent pickRootFolderIntent = new Intent(this, FileChooserActivity.class);
-           //startActivityForResult(pickRootFolderIntent, RequestCodes.CHOOSE_FILE);
+
+    public void onTargetFolderClicked(View v){
         Intent intent = new Intent(this, FileChooserActivity.class);
         intent.putExtra(FileChooserActivity.INPUT_FOLDER_MODE, true);
-        this.startActivityForResult(intent, RequestCodes.CHOOSE_FILE);
+        this.startActivityForResult(intent, RequestCodes.CHOOSE_TARGET_FOLDER);
     }
     //----------------------------------------------------------
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //If the request went well (OK) and the request was PICK_CONTACT_REQUEST
-        if (resultCode == Activity.RESULT_OK && requestCode == RequestCodes.CHOOSE_FILE) {
-            boolean fileCreated = false;
-            String filePath = "";
 
+        //If the request went well (OK) and the request was PICK_CONTACT_REQUEST
+        if (resultCode == Activity.RESULT_OK ) {
             Bundle bundle = data.getExtras();
+
             if(bundle != null)
             {
-                if(bundle.containsKey(FileChooserActivity.OUTPUT_NEW_FILE_NAME)) {
-                    fileCreated = true;
-                    File folder = (File) bundle.get(FileChooserActivity.OUTPUT_FILE_OBJECT);
-                    String name = bundle.getString(FileChooserActivity.OUTPUT_NEW_FILE_NAME);
-                    filePath = folder.getAbsolutePath() + "/" + name;
-                } else {
-                    fileCreated = false;
-                    File file = (File) bundle.get(FileChooserActivity.OUTPUT_FILE_OBJECT);
-                    filePath = file.getName();
-
+                File file = (File) bundle.get(FileChooserActivity.OUTPUT_FILE_OBJECT);
+                //--------------------------------------------------------------------
+                //Folders must be diffrent!!!
+                if(requestCode == RequestCodes.CHOOSE_ROOT_FOLDER) {
+                    TextView lblRootFolderPath = (TextView) findViewById(R.id.lblRootFolderPath);
+                    lblRootFolderPath.setText(file.getPath());
+                }
+                else if(requestCode == RequestCodes.CHOOSE_TARGET_FOLDER) {
+                    TextView lblTargetFolderPath = (TextView) findViewById(R.id.lblTargetFolderPath);
+                    lblTargetFolderPath.setText(file.getPath());
                 }
             }
-
-            String message = fileCreated? "File created" : "File opened";
-            message += ": " + filePath;
-            Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
-            toast.show();
         }
     }
     //----------------------------------------------------------
@@ -160,6 +157,9 @@ public class MainActivity extends AppCompatActivity {
             return fragment;
         }
 
+        FragmentSettingsBinding binding;
+        SettingsVM settings;
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
@@ -169,13 +169,32 @@ public class MainActivity extends AppCompatActivity {
 
             if(index == 0){
                 //rootView = inflater.inflate(R.layout.fragment_settings, container, false);
-                FragmentSettingsBinding binding =
-                        FragmentSettingsBinding.inflate(inflater, container, false);
+                binding = FragmentSettingsBinding.inflate(inflater, container, false);
 
-                SettingsVM settings = new SettingsVM();
+                settings = new SettingsVM();
                 binding.setSettingsVM(settings);
                 //binding.setListeners(new Settings.Listeners(binding));
                 rootView = binding.getRoot();
+
+                Button cmdRootFolder = (Button) rootView.findViewById(R.id.cmdRootFolder);
+                cmdRootFolder.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        onRootFolderClicked(v);
+                    }
+                });
+
+                Button cmdTargetFolder = (Button) rootView.findViewById(R.id.cmdTargetFolder);
+                cmdTargetFolder.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        onTargetFolderClicked(v);
+                    }
+                });
             }
             else if(index == 1){
                 rootView = inflater.inflate(R.layout.fragment_play, container, false);
@@ -186,6 +205,16 @@ public class MainActivity extends AppCompatActivity {
 
 
             return rootView;
+        }
+        public void onRootFolderClicked(View v){
+            Intent intent = new Intent(this.getActivity(), FileChooserActivity.class);
+            intent.putExtra(FileChooserActivity.INPUT_FOLDER_MODE, true);
+            this.getActivity().startActivityForResult(intent, RequestCodes.CHOOSE_ROOT_FOLDER);
+        }
+        public void onTargetFolderClicked(View v){
+            Intent intent = new Intent(this.getActivity(), FileChooserActivity.class);
+            intent.putExtra(FileChooserActivity.INPUT_FOLDER_MODE, true);
+            this.getActivity().startActivityForResult(intent, RequestCodes.CHOOSE_TARGET_FOLDER);
         }
     }
 

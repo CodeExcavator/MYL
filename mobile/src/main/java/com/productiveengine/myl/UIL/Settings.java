@@ -1,6 +1,7 @@
 package com.productiveengine.myl.UIL;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,8 +11,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.productiveengine.myl.Common.RequestCodes;
 import com.productiveengine.myl.UIL.databinding.FragmentSettingsBinding;
 import com.productiveengine.myl.ViewModels.SettingsVM;
+
+import ar.com.daidalos.afiledialog.FileChooserActivity;
 
 
 /**
@@ -68,8 +72,14 @@ public class Settings extends Fragment {
     }
 
     @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+
+    }
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        View rootView = null;
         // Inflate the layout for this fragment
         //View rootView = (ViewGroup)inflater.inflate(R.layout.fragment_settings, container, false);
         FragmentSettingsBinding binding =
@@ -77,8 +87,12 @@ public class Settings extends Fragment {
 
         SettingsVM settings = new SettingsVM();
         binding.setSettingsVM(settings);
-        return binding.getRoot();
+
+        rootView = binding.getRoot();
+
+        return rootView;
     }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

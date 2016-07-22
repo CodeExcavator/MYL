@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:text="..."
             android:id="@+id/cmdRootFolder"
-            android:onClick="onRootFolderClicked"/>
+            />
 
         <TextView
             android:layout_width="wrap_content"
@@ -53,8 +53,8 @@
             android:layout_height="wrap_content"
             android:text="..."
             android:id="@+id/cmdTargetFolder"
-            android:onClick="@{settingsVM::onClickFriend}"
             />
+        <!-- android:onClick="@{settingsVM::onClickFriend}" -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

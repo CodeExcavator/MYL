@@ -3,6 +3,7 @@ package com.productiveengine.myl.UIL;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -18,9 +19,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.productiveengine.myl.Common.LoveCriteria;
 import com.productiveengine.myl.Common.RequestCodes;
 import com.productiveengine.myl.UIL.databinding.FragmentSettingsBinding;
 import com.productiveengine.myl.ViewModels.SettingsVM;
@@ -30,9 +34,6 @@ import java.io.File;
 import ar.com.daidalos.afiledialog.FileChooserActivity;
 
 public class MainActivity extends AppCompatActivity {
-
-    //final TextView lblRootFolderPath = (TextView) findViewById(R.id.lblRootFolderPath);
-    //final TextView lblTargetFolderPath = (TextView) findViewById(R.id.lblTargetFolderPath);
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -58,6 +59,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+        TextView lblRootFolderPath = (TextView) findViewById(R.id.lblRootFolderPath);
+        TextView lblTargetFolderPath = (TextView) findViewById(R.id.lblTargetFolderPath);
+
         //If the request went well (OK) and the request was PICK_CONTACT_REQUEST
         if (resultCode == Activity.RESULT_OK ) {
             Bundle bundle = data.getExtras();
@@ -66,17 +70,34 @@ public class MainActivity extends AppCompatActivity {
             {
                 File file = (File) bundle.get(FileChooserActivity.OUTPUT_FILE_OBJECT);
                 //--------------------------------------------------------------------
-                //Folders must be diffrent!!!
                 if(requestCode == RequestCodes.CHOOSE_ROOT_FOLDER) {
-                    TextView lblRootFolderPath = (TextView) findViewById(R.id.lblRootFolderPath);
                     lblRootFolderPath.setText(file.getPath());
+
+                    if(!checkFolderPaths(lblRootFolderPath.getText()+"",lblTargetFolderPath.getText()+"")){
+                        lblRootFolderPath.setText("");
+                    }
                 }
                 else if(requestCode == RequestCodes.CHOOSE_TARGET_FOLDER) {
-                    TextView lblTargetFolderPath = (TextView) findViewById(R.id.lblTargetFolderPath);
                     lblTargetFolderPath.setText(file.getPath());
+
+                    if(!checkFolderPaths(lblRootFolderPath.getText()+"",lblTargetFolderPath.getText()+"")){
+                        lblTargetFolderPath.setText("");
+                    }
                 }
             }
         }
+    }
+
+    private boolean checkFolderPaths(String folderPath1, String folderPath2){
+        boolean ok = true;
+
+        if(folderPath1.equals(folderPath2)) {
+            Toast toast = Toast.makeText(this, "Root and Target folders must be different!!!", Toast.LENGTH_LONG);
+            toast.show();
+            ok = false;
+        }
+
+        return ok;
     }
     //----------------------------------------------------------
     @Override
@@ -105,18 +126,13 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-
-
     }
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -176,8 +192,8 @@ public class MainActivity extends AppCompatActivity {
                 //binding.setListeners(new Settings.Listeners(binding));
                 rootView = binding.getRoot();
 
-                Button cmdRootFolder = (Button) rootView.findViewById(R.id.cmdRootFolder);
-                cmdRootFolder.setOnClickListener(new View.OnClickListener()
+                Button btnRootFolder = (Button) rootView.findViewById(R.id.btnRootFolder);
+                btnRootFolder.setOnClickListener(new View.OnClickListener()
                 {
                     @Override
                     public void onClick(View v)
@@ -186,13 +202,33 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-                Button cmdTargetFolder = (Button) rootView.findViewById(R.id.cmdTargetFolder);
-                cmdTargetFolder.setOnClickListener(new View.OnClickListener()
+                Button btnTargetFolder = (Button) rootView.findViewById(R.id.btnTargetFolder);
+                btnTargetFolder.setOnClickListener(new View.OnClickListener()
                 {
                     @Override
                     public void onClick(View v)
                     {
                         onTargetFolderClicked(v);
+                    }
+                });
+
+                RadioButton btnTimeLimit = (RadioButton) rootView.findViewById(R.id.btnTimeLimit);
+                btnTimeLimit.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        onLoveCriteriaChanged(v);
+                    }
+                });
+
+                RadioButton btnPercentage = (RadioButton) rootView.findViewById(R.id.btnPercentage);
+                btnPercentage.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        onLoveCriteriaChanged(v);
                     }
                 });
             }
@@ -207,14 +243,43 @@ public class MainActivity extends AppCompatActivity {
             return rootView;
         }
         public void onRootFolderClicked(View v){
+
             Intent intent = new Intent(this.getActivity(), FileChooserActivity.class);
             intent.putExtra(FileChooserActivity.INPUT_FOLDER_MODE, true);
             this.getActivity().startActivityForResult(intent, RequestCodes.CHOOSE_ROOT_FOLDER);
         }
         public void onTargetFolderClicked(View v){
+
             Intent intent = new Intent(this.getActivity(), FileChooserActivity.class);
             intent.putExtra(FileChooserActivity.INPUT_FOLDER_MODE, true);
             this.getActivity().startActivityForResult(intent, RequestCodes.CHOOSE_TARGET_FOLDER);
+        }
+
+        public void onLoveCriteriaChanged(View v) {
+
+            EditText txtTimeLimit = (EditText) v.findViewById(R.id.txtTimeLimit);
+            EditText txtTimePercentage = (EditText) v.findViewById(R.id.txtTimePercentage);
+            boolean checked = ((RadioButton) v).isChecked();
+
+            switch(v.getId()) {
+                case R.id.btnTimeLimit:
+                    if (checked){
+                        settings.setLoveCriteria(LoveCriteria.TIME_LIMIT);
+
+                        txtTimeLimit.setEnabled(true);
+                        txtTimePercentage.setEnabled(false);
+                    }
+                break;
+
+                case R.id.btnPercentage:
+                    if (checked){
+                        settings.setLoveCriteria(LoveCriteria.PERCENTAGE);
+
+                        txtTimeLimit.setEnabled(false);
+                        txtTimePercentage.setEnabled(true);
+                    }
+                break;
+            }
         }
     }
 

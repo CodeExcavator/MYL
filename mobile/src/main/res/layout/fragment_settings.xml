@@ -3,10 +3,6 @@
         <variable
             name="settingsVM"
             type="com.productiveengine.myl.ViewModels.SettingsVM"/>
-        <variable
-            name="listeners"
-            type="com.productiveengine.myl.UIL.Settings.Listeners"
-            />
     </data>
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -31,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="..."
-            android:id="@+id/cmdRootFolder"
+            android:id="@+id/btnRootFolder"
             />
 
         <TextView
@@ -52,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="..."
-            android:id="@+id/cmdTargetFolder"
+            android:id="@+id/btnTargetFolder"
             />
         <!-- android:onClick="@{settingsVM::onClickFriend}" -->
         <TextView
@@ -64,7 +60,7 @@
         <RadioGroup
             android:id="@+id/radioGroup"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content">
 
             <!--   -->
             <RadioButton
@@ -72,36 +68,28 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text= "@string/timeLimit"
-                android:checked="true"
                 />
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:text="@={`` + settingsVM.timeLimit}"
-                    android:ems="10"
-                    android:id="@+id/editText" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:text="@={`` + settingsVM.timeLimit}"
+                android:ems="10"
+                android:id="@+id/txtTimeLimit" />
             <!--   -->
             <RadioButton
                 android:id="@+id/btnPercentage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/timePercentage" />
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:text="@={`` + settingsVM.timePercentage}"
-                    android:ems="10"
-                    android:id="@+id/txtTimePercentage" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="@{`` + settingsVM.timePercentage}"
-                    android:id="@+id/lblPercentageSymbolaa" />
-
+                android:text="@string/timePercentage"
+                />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:text="@={`` + settingsVM.timePercentage}"
+                android:ems="10"
+                android:id="@+id/txtTimePercentage" />
         </RadioGroup>
 
         <!--

@@ -1,13 +1,47 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.productiveengine.myl.UIL.Play">
-
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+<layout>
+    <data>
+        <variable
+            name="settingsVM"
+            type="com.productiveengine.myl.ViewModels.PlayVM"/>
+    </data>
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/test" />
+        tools:context="com.productiveengine.myl.UIL.Play">
 
-</FrameLayout>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="1">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/txtCurrentSong"
+                android:text="-" />
+
+            <Button
+                android:text="Pause"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnPause"
+                android:layout_weight="0.15" />
+
+            <Button
+                android:text="Replay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnReplay"
+                android:layout_weight="0.12" />
+
+            <Button
+                android:text="Next"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnNext"
+                android:layout_weight="0.30" />
+        </LinearLayout>
+    </FrameLayout>
+</layout>

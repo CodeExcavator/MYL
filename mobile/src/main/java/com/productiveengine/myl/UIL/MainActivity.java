@@ -176,6 +176,9 @@ public class MainActivity extends AppCompatActivity {
         FragmentSettingsBinding binding;
         SettingsVM settings;
 
+        EditText txtTimeLimit;
+        EditText txtTimePercentage;
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
@@ -213,6 +216,7 @@ public class MainActivity extends AppCompatActivity {
                 });
 
                 RadioButton btnTimeLimit = (RadioButton) rootView.findViewById(R.id.btnTimeLimit);
+                btnTimeLimit.setChecked(true);
                 btnTimeLimit.setOnClickListener(new View.OnClickListener()
                 {
                     @Override
@@ -231,14 +235,14 @@ public class MainActivity extends AppCompatActivity {
                         onLoveCriteriaChanged(v);
                     }
                 });
+
+                txtTimeLimit = (EditText) rootView.findViewById(R.id.txtTimeLimit);
+                txtTimePercentage = (EditText) rootView.findViewById(R.id.txtTimePercentage);
+                txtTimePercentage.setEnabled(false);
             }
             else if(index == 1){
                 rootView = inflater.inflate(R.layout.fragment_play, container, false);
             }
-            //View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            //TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-
 
             return rootView;
         }
@@ -257,8 +261,6 @@ public class MainActivity extends AppCompatActivity {
 
         public void onLoveCriteriaChanged(View v) {
 
-            EditText txtTimeLimit = (EditText) v.findViewById(R.id.txtTimeLimit);
-            EditText txtTimePercentage = (EditText) v.findViewById(R.id.txtTimePercentage);
             boolean checked = ((RadioButton) v).isChecked();
 
             switch(v.getId()) {
@@ -268,6 +270,7 @@ public class MainActivity extends AppCompatActivity {
 
                         txtTimeLimit.setEnabled(true);
                         txtTimePercentage.setEnabled(false);
+                        settings.setTimePercentage(0);
                     }
                 break;
 
@@ -277,6 +280,7 @@ public class MainActivity extends AppCompatActivity {
 
                         txtTimeLimit.setEnabled(false);
                         txtTimePercentage.setEnabled(true);
+                        settings.setTimeLimit(0);
                     }
                 break;
             }

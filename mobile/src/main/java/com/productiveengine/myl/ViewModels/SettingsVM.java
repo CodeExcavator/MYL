@@ -8,16 +8,20 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import com.productiveengine.myl.BL.SettingsBL;
 import com.productiveengine.myl.Common.LoveCriteria;
 import com.productiveengine.myl.Common.RequestCodes;
+import com.productiveengine.myl.DomainClasses.Settings;
 import com.productiveengine.myl.UIL.BR;
 
 import java.io.Serializable;
+import java.util.List;
 
 import ar.com.daidalos.afiledialog.FileChooserActivity;
 
 public class SettingsVM  extends BaseObservable implements Serializable{
 
+    private Settings settings;
     private String rootFolderPath;
     private String targetFolderPath;
     private String rootFolder;
@@ -29,10 +33,19 @@ public class SettingsVM  extends BaseObservable implements Serializable{
 
     private boolean screenOn;
 
-    public SettingsVM() {
+    private SettingsBL settingsBL;
 
+    public SettingsVM() {
+        settingsBL = new SettingsBL();
+        settings = settingsBL.initializeSettingsOnDB();
     }
 
+    private void notifyAndSave(int fieldId){
+        settingsBL.saveData(settings);
+        notifyPropertyChanged(fieldId);
+    }
+
+    //Setters getters
     @Bindable
     public String getRootFolderPath() {
         return rootFolderPath;
@@ -40,7 +53,7 @@ public class SettingsVM  extends BaseObservable implements Serializable{
 
     public void setRootFolderPath(String rootFolderPath) {
         this.rootFolderPath = rootFolderPath;
-        notifyPropertyChanged(BR.rootFolderPath);
+        notifyAndSave(BR.rootFolderPath);
     }
 
     @Bindable
@@ -50,7 +63,7 @@ public class SettingsVM  extends BaseObservable implements Serializable{
 
     public void setTargetFolderPath(String targetFolderPath) {
         this.targetFolderPath = targetFolderPath;
-        notifyPropertyChanged(BR.targetFolderPath);
+        notifyAndSave(BR.targetFolderPath);
     }
 
     @Bindable
@@ -60,7 +73,7 @@ public class SettingsVM  extends BaseObservable implements Serializable{
 
     public void setRootFolder(String rootFolder) {
         this.rootFolder = rootFolder;
-        notifyPropertyChanged(BR.rootFolder);
+        notifyAndSave(BR.rootFolder);
     }
 
     @Bindable
@@ -70,7 +83,7 @@ public class SettingsVM  extends BaseObservable implements Serializable{
 
     public void setTargetFolder(String targetFolder) {
         this.targetFolder = targetFolder;
-        notifyPropertyChanged(BR.targetFolder);
+        notifyAndSave(BR.targetFolder);
     }
 
     @Bindable
@@ -80,7 +93,7 @@ public class SettingsVM  extends BaseObservable implements Serializable{
 
     public void setLoveCriteria(LoveCriteria loveCriteria) {
         this.loveCriteria = loveCriteria;
-        notifyPropertyChanged(BR.loveCriteria);
+        notifyAndSave(BR.loveCriteria);
     }
 
     @Bindable
@@ -90,7 +103,7 @@ public class SettingsVM  extends BaseObservable implements Serializable{
 
     public void setTimeLimit(int timeLimit) {
         this.timeLimit = timeLimit;
-        notifyPropertyChanged(BR.timeLimit);
+        notifyAndSave(BR.timeLimit);
     }
 
     @Bindable
@@ -100,7 +113,7 @@ public class SettingsVM  extends BaseObservable implements Serializable{
 
     public void setTimePercentage(int timePercentage) {
         this.timePercentage = timePercentage;
-        notifyPropertyChanged(BR.timePercentage);
+        notifyAndSave(BR.timePercentage);
     }
 
     @Bindable
@@ -110,6 +123,6 @@ public class SettingsVM  extends BaseObservable implements Serializable{
 
     public void setScreenOn(boolean screenOn) {
         this.screenOn = screenOn;
-        notifyPropertyChanged(BR.screenOn);
+        notifyAndSave(BR.screenOn);
     }
 }

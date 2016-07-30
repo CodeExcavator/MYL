@@ -12,8 +12,15 @@ import java.io.Serializable;
 public class PlayVM extends BaseObservable implements Serializable {
 
     private String currentSong;
+    //private SettingsVM settingsVM;
 
     public PlayVM(){
+
+    }
+
+    public void playNextSong(){
+
+        //Check love
 
     }
 
@@ -25,4 +32,15 @@ public class PlayVM extends BaseObservable implements Serializable {
     public void setCurrentSong(String currentSong) {
         this.currentSong = currentSong;
     }
+
+    /*
+    @Bindable
+    public SettingsVM getSettingsVM() {
+        return settingsVM;
+    }
+
+    public void setSettingsVM(SettingsVM settingsVM) {
+        this.settingsVM = settingsVM;
+    }
+    */
 }

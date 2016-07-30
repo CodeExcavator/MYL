@@ -3,7 +3,6 @@ package com.productiveengine.myl.UIL;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -26,10 +25,13 @@ import android.widget.Toast;
 
 import com.productiveengine.myl.Common.LoveCriteria;
 import com.productiveengine.myl.Common.RequestCodes;
+import com.productiveengine.myl.UIL.databinding.FragmentPlayBinding;
 import com.productiveengine.myl.UIL.databinding.FragmentSettingsBinding;
+import com.productiveengine.myl.ViewModels.PlayVM;
 import com.productiveengine.myl.ViewModels.SettingsVM;
 
 import java.io.File;
+import java.util.List;
 
 import ar.com.daidalos.afiledialog.FileChooserActivity;
 
@@ -87,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
     private boolean checkFolderPaths(String folderPath1, String folderPath2){
         boolean ok = true;
 
@@ -107,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Create the adapter that will return a fragment for each of the three
+        // Create the adapter that will return a fragment for each of the two
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -173,8 +174,13 @@ public class MainActivity extends AppCompatActivity {
             return fragment;
         }
 
-        FragmentSettingsBinding binding;
-        SettingsVM settings;
+        FragmentSettingsBinding fragmentSettingsBinding;
+        SettingsVM settingsVM;
+
+        FragmentPlayBinding fragmentPlayBinding;
+        PlayVM playVM;
+
+        TextView txtTest;
 
         EditText txtTimeLimit;
         EditText txtTimePercentage;
@@ -187,13 +193,16 @@ public class MainActivity extends AppCompatActivity {
             View rootView = null;
 
             if(index == 0){
+                //-------------------------------------------------------------------------
+                //Settings fragment
+                //-------------------------------------------------------------------------
                 //rootView = inflater.inflate(R.layout.fragment_settings, container, false);
-                binding = FragmentSettingsBinding.inflate(inflater, container, false);
+                fragmentSettingsBinding = FragmentSettingsBinding.inflate(inflater, container, false);
 
-                settings = new SettingsVM();
-                binding.setSettingsVM(settings);
-                //binding.setListeners(new Settings.Listeners(binding));
-                rootView = binding.getRoot();
+                settingsVM = new SettingsVM();
+                fragmentSettingsBinding.setSettingsVM(settingsVM);
+                //fragmentSettingsBinding.setListeners(new Settings.Listeners(fragmentSettingsBinding));
+                rootView = fragmentSettingsBinding.getRoot();
 
                 Button btnRootFolder = (Button) rootView.findViewById(R.id.btnRootFolder);
                 btnRootFolder.setOnClickListener(new View.OnClickListener()
@@ -241,11 +250,40 @@ public class MainActivity extends AppCompatActivity {
                 txtTimePercentage.setEnabled(false);
             }
             else if(index == 1){
-                rootView = inflater.inflate(R.layout.fragment_play, container, false);
+                //-------------------------------------------------------------------------
+                //Play fragment
+                //-------------------------------------------------------------------------
+                fragmentPlayBinding = FragmentPlayBinding.inflate(inflater, container, false);
+
+                playVM = new PlayVM();
+                fragmentPlayBinding.setPlayVM(playVM);
+                rootView = fragmentPlayBinding.getRoot();
+
+
+                txtTest = (TextView) rootView.findViewById(R.id.txtTest);
+
+                View settingsView = inflater.inflate(R.layout.fragment_settings, container, false);
+                //txtTest.setText(settingsView.getContext(). .getRootFolder());
+
+                Button btnNext = (Button) rootView.findViewById(R.id.btnNext);
+                btnNext.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        onNextClicked(v);
+                    }
+                });
             }
 
             return rootView;
         }
+        //Play -------------------------------------------------------------------------------
+        public void onNextClicked(View v){
+
+            playVM.playNextSong();
+        }
+        //Settings -------------------------------------------------------------------------------
         public void onRootFolderClicked(View v){
 
             Intent intent = new Intent(this.getActivity(), FileChooserActivity.class);
@@ -258,7 +296,6 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra(FileChooserActivity.INPUT_FOLDER_MODE, true);
             this.getActivity().startActivityForResult(intent, RequestCodes.CHOOSE_TARGET_FOLDER);
         }
-
         public void onLoveCriteriaChanged(View v) {
 
             boolean checked = ((RadioButton) v).isChecked();
@@ -266,58 +303,25 @@ public class MainActivity extends AppCompatActivity {
             switch(v.getId()) {
                 case R.id.btnTimeLimit:
                     if (checked){
-                        settings.setLoveCriteria(LoveCriteria.TIME_LIMIT);
+                        settingsVM.setLoveCriteria(LoveCriteria.TIME_LIMIT);
 
                         txtTimeLimit.setEnabled(true);
                         txtTimePercentage.setEnabled(false);
-                        settings.setTimePercentage(0);
+                        settingsVM.setTimePercentage(0);
                     }
                 break;
 
                 case R.id.btnPercentage:
                     if (checked){
-                        settings.setLoveCriteria(LoveCriteria.PERCENTAGE);
+                        settingsVM.setLoveCriteria(LoveCriteria.PERCENTAGE);
 
                         txtTimeLimit.setEnabled(false);
                         txtTimePercentage.setEnabled(true);
-                        settings.setTimeLimit(0);
+                        settingsVM.setTimeLimit(0);
                     }
                 break;
             }
         }
     }
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position);
-        }
-
-        @Override
-        public int getCount() {
-            return 2;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "Settings";
-                case 1:
-                    return "Play";
-            }
-            return null;
-        }
-    }
 }

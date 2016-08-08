@@ -1,4 +1,6 @@
-package com.productiveengine.myl.BL;
+package com.productiveengine.myl.BLL;
+
+import android.util.Log;
 
 import com.productiveengine.myl.DomainClasses.Settings;
 
@@ -9,10 +11,10 @@ import java.util.List;
  */
 
 public class SettingsBL {
+    Settings settings;
 
     public Settings initializeSettingsOnDB(){
-        Settings settings;
-        List<Settings> allSettings = Settings.listAll(Settings.class);
+        List<Settings> allSettings = Settings.getAll();
 
         if(allSettings == null || allSettings.size() == 0){
             //Create new
@@ -24,7 +26,7 @@ public class SettingsBL {
         else{
             //Delete all settings and create a
             //new record.
-            Settings.deleteAll(Settings.class);
+            //Settings.deleteAll(Settings.class);
             settings = new Settings();
         }
         return settings;
@@ -32,6 +34,7 @@ public class SettingsBL {
 
     public void saveData(Settings settings){
         //TODO: Try catch, error handling
+        //Log.d(settings.timeLimit+"","test");
         settings.save();
     }
 }

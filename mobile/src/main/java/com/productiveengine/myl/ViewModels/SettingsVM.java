@@ -1,23 +1,16 @@
 package com.productiveengine.myl.ViewModels;
 
-import android.content.Intent;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.view.View;
-import android.widget.Button;
-import android.widget.RadioButton;
-import android.widget.Toast;
+import android.os.Debug;
+import android.util.Log;
 
-import com.productiveengine.myl.BL.SettingsBL;
+import com.productiveengine.myl.BLL.SettingsBL;
 import com.productiveengine.myl.Common.LoveCriteria;
-import com.productiveengine.myl.Common.RequestCodes;
 import com.productiveengine.myl.DomainClasses.Settings;
 import com.productiveengine.myl.UIL.BR;
 
 import java.io.Serializable;
-import java.util.List;
-
-import ar.com.daidalos.afiledialog.FileChooserActivity;
 
 public class SettingsVM  extends BaseObservable implements Serializable{
 
@@ -38,9 +31,37 @@ public class SettingsVM  extends BaseObservable implements Serializable{
     public SettingsVM() {
         settingsBL = new SettingsBL();
         settings = settingsBL.initializeSettingsOnDB();
+
+        //----------------------------------------------
+        rootFolderPath = settings.rootFolderPath;
+        targetFolderPath = settings.targetFolderPath;
+        rootFolder = settings.rootFolder;
+        targetFolder = settings.targetFolder;
+
+        loveCriteria = LoveCriteria.fromInt(settings.loveCriteria);
+        timeLimit = settings.timeLimit;
+        timePercentage = settings.timePercentage;
+
+        screenOn = settings.screenOn;
+        //----------------------------------------------
     }
 
     private void notifyAndSave(int fieldId){
+        //--------------------------------------------
+        settings.rootFolderPath = rootFolderPath;
+        settings.targetFolderPath = targetFolderPath;
+        settings.rootFolder = rootFolder;
+        settings.targetFolder = targetFolder;
+
+        if(loveCriteria != null) {
+            settings.loveCriteria = loveCriteria.ordinal();
+        }
+        settings.timeLimit = timeLimit;
+        settings.timePercentage = timePercentage;
+
+        settings.screenOn = screenOn;
+        //--------------------------------------------
+
         settingsBL.saveData(settings);
         notifyPropertyChanged(fieldId);
     }

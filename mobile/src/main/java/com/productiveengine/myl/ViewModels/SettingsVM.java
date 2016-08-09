@@ -2,8 +2,6 @@ package com.productiveengine.myl.ViewModels;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.os.Debug;
-import android.util.Log;
 
 import com.productiveengine.myl.BLL.SettingsBL;
 import com.productiveengine.myl.Common.LoveCriteria;
@@ -28,9 +26,12 @@ public class SettingsVM  extends BaseObservable implements Serializable{
 
     private SettingsBL settingsBL;
 
+    //-------------------------------
+    private boolean timeLimitChk;
+
     public SettingsVM() {
         settingsBL = new SettingsBL();
-        settings = settingsBL.initializeSettingsOnDB();
+        settings = settingsBL.initializeSettingsFromDB();
 
         //----------------------------------------------
         rootFolderPath = settings.rootFolderPath;
@@ -39,6 +40,18 @@ public class SettingsVM  extends BaseObservable implements Serializable{
         targetFolder = settings.targetFolder;
 
         loveCriteria = LoveCriteria.fromInt(settings.loveCriteria);
+
+        switch (loveCriteria){
+            case TIME_LIMIT:
+                timeLimitChk = true;
+                break;
+            case PERCENTAGE:
+                timeLimitChk = false;
+                break;
+            default:
+                timeLimitChk = true;
+        }
+
         timeLimit = settings.timeLimit;
         timePercentage = settings.timePercentage;
 
@@ -145,5 +158,14 @@ public class SettingsVM  extends BaseObservable implements Serializable{
     public void setScreenOn(boolean screenOn) {
         this.screenOn = screenOn;
         notifyAndSave(BR.screenOn);
+    }
+
+    @Bindable
+    public boolean isTimeLimitChk() {
+        return timeLimitChk;
+    }
+
+    public void setTimeLimitChk(boolean timeLimitChk) {
+        this.timeLimitChk = timeLimitChk;
     }
 }

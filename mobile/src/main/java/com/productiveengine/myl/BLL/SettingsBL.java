@@ -13,7 +13,7 @@ import java.util.List;
 public class SettingsBL {
     Settings settings;
 
-    public Settings initializeSettingsOnDB(){
+    public Settings initializeSettingsFromDB(){
         List<Settings> allSettings = Settings.getAll();
 
         if(allSettings == null || allSettings.size() == 0){

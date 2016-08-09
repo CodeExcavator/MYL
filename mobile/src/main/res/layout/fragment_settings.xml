@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@{settingsVM.rootFolderPath}"
+            android:text="@={settingsVM.rootFolderPath}"
             android:id="@+id/lblRootFolderPath" />
         <TextView
             android:layout_width="wrap_content"
@@ -55,7 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@{settingsVM.rootFolderPath}"
+            android:text="@={settingsVM.targetFolderPath}"
             android:id="@+id/lblTargetFolderPath" />
         <RadioGroup
             android:id="@+id/radioGroup"
@@ -68,6 +68,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text= "@string/timeLimit"
+                android:checked="@={settingsVM.timeLimitChk}"
                 />
             <EditText
                 android:layout_width="match_parent"
@@ -82,6 +83,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/timePercentage"
+                android:checked="@={!settingsVM.timeLimitChk}"
                 />
             <EditText
                 android:layout_width="match_parent"

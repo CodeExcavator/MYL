@@ -1,8 +1,14 @@
 package com.productiveengine.myl.UIL;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -23,6 +29,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.productiveengine.myl.BLL.AudioPlayBL;
 import com.productiveengine.myl.Common.LoveCriteria;
 import com.productiveengine.myl.Common.RequestCodes;
 import com.productiveengine.myl.UIL.databinding.FragmentPlayBinding;
@@ -51,7 +58,33 @@ public class MainActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    //----------------------------
+    private static long selected_song_id = 0;
+    private static long playing_now_song_id = 0;
 
+    //My Locks
+    public static boolean initialPlay = true;
+    private boolean playOrPause = true;
+
+    //Backgroud Service instance
+    public AudioPlayBL audioPlayService;
+
+    //Service Binding
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        public void onServiceConnected(ComponentName className, IBinder binder) {
+            audioPlayService = ((AudioPlayBL.MyBinder) binder).getService();
+
+        }
+        public void onServiceDisconnected(ComponentName className) {
+            audioPlayService = null;
+        }
+    };
+    void doBindService() {
+        bindService(new Intent(this, AudioPlayBL.class), mConnection,
+                Context.BIND_AUTO_CREATE);
+    }
+    //----------------------------------------------------------
     public void onTargetFolderClicked(View v){
         Intent intent = new Intent(this, FileChooserActivity.class);
         intent.putExtra(FileChooserActivity.INPUT_FOLDER_MODE, true);
@@ -127,6 +160,9 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        //Bind with background service -----------------------------------------------
+        doBindService();
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -274,6 +310,14 @@ public class MainActivity extends AppCompatActivity {
                         onNextClicked(v);
                     }
                 });
+
+                Button btnRefreshSongList = (Button) rootView.findViewById(R.id.btnRefreshSongList);
+                btnRefreshSongList.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onRefreshSongListClicked(v);
+                    }
+                });
             }
 
             return rootView;
@@ -281,7 +325,20 @@ public class MainActivity extends AppCompatActivity {
         //Play -------------------------------------------------------------------------------
         public void onNextClicked(View v){
 
-            playVM.playNextSong();
+            String nextSongPath = "";
+            nextSongPath = playVM.getNextSong();
+
+            Intent intent = new Intent(this.getActivity(), AudioPlayBL.class);
+            Bundle b = new Bundle();
+            b.putString("songPath",nextSongPath);
+            intent.putExtras(b);
+
+            MainActivity ma = (MainActivity) this.getActivity();
+            ma.audioPlayService.onDestroy();
+            ma.audioPlayService.startService(intent);
+        }
+        public void onRefreshSongListClicked(View v){
+            playVM.refreshSongList();
         }
         //Settings -------------------------------------------------------------------------------
         public void onRootFolderClicked(View v){
@@ -308,6 +365,7 @@ public class MainActivity extends AppCompatActivity {
                         txtTimeLimit.setEnabled(true);
                         txtTimePercentage.setEnabled(false);
                         settingsVM.setTimePercentage(0);
+                        settingsVM.setTimeLimitChk(true);
                     }
                 break;
 
@@ -318,6 +376,7 @@ public class MainActivity extends AppCompatActivity {
                         txtTimeLimit.setEnabled(false);
                         txtTimePercentage.setEnabled(true);
                         settingsVM.setTimeLimit(0);
+                        settingsVM.setTimeLimitChk(false);
                     }
                 break;
             }

@@ -23,6 +23,13 @@
                 android:text="-" />
 
             <Button
+                android:text="Refresh song list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnRefreshSongList"
+                />
+
+            <Button
                 android:text="Pause"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

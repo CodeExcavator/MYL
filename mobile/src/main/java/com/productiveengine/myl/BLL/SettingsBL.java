@@ -2,6 +2,7 @@ package com.productiveengine.myl.BLL;
 
 import android.util.Log;
 
+import com.activeandroid.query.Select;
 import com.productiveengine.myl.DomainClasses.Settings;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public class SettingsBL {
     Settings settings;
 
     public Settings initializeSettingsFromDB(){
-        List<Settings> allSettings = Settings.getAll();
+        List<Settings> allSettings = getAll();
 
         if(allSettings == null || allSettings.size() == 0){
             //Create new
@@ -36,5 +37,11 @@ public class SettingsBL {
         //TODO: Try catch, error handling
         //Log.d(settings.timeLimit+"","test");
         settings.save();
+    }
+
+    public List<Settings> getAll() {
+        return new Select()
+                .from(Settings.class)
+                .execute();
     }
 }

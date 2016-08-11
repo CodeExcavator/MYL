@@ -10,7 +10,9 @@ import android.os.IBinder;
 
 import com.productiveengine.myl.BLL.AudioPlayBL;
 import com.productiveengine.myl.BLL.SettingsBL;
+import com.productiveengine.myl.BLL.SongBL;
 import com.productiveengine.myl.DomainClasses.Settings;
+import com.productiveengine.myl.DomainClasses.Song;
 
 import java.io.File;
 import java.io.Serializable;
@@ -23,37 +25,33 @@ import java.util.List;
 
 public class PlayVM extends BaseObservable implements Serializable {
 
-    private String currentSong;
+    private String currentSongName;
     private Settings settings;
-    private List<String> songPaths;
-    private int songIndex = 0;
-
+    private SongBL songBL;
+    private List<Song> songList;
+    private Song currentSong;
     private boolean traversable = true;
 
     public PlayVM(){
-
-
+        songBL = new SongBL();
     }
 
-    public String getNextSong(){
+    public Song getNextSong(){
+        currentSong = songBL.fetchNextSong();
 
-        String songPath = "";
-
-        if(songPaths != null && songPaths.size() > 0) {
-            songPath = songPaths.get(songIndex++);
-
-            setCurrentSong(songPath);
+        if(currentSong != null){
+            setCurrentSongName(currentSong.name);
         }
-        return songPath;
+        return currentSong;
     }
 
     public void refreshSongList(){
         settings = (new SettingsBL()).initializeSettingsFromDB();
-        songIndex = 0;
 
-        if(traversable){
-            songPaths = new ArrayList<>();
+        if(traversable && settings.rootFolderPath != null && settings.rootFolderPath.trim().length() > 0){
+            songList = new ArrayList<Song>();
             traverse(new File(settings.rootFolderPath));
+            songBL.saveAll(songList);
         }
     }
 
@@ -69,19 +67,24 @@ public class PlayVM extends BaseObservable implements Serializable {
                 if (file.isDirectory()) {
                     traverse(file);
                 } else if(filePath.endsWith(".mp3") || filePath.endsWith(".3gp") || filePath.endsWith(".flac") || filePath.endsWith(".ogg") || filePath.endsWith(".wav") ) {
-                    songPaths.add(filePath);
+                    /*
+                    Song song = new Song();
+                    song.path = filePath;
+                    song.name = file.getName();
+                    */
+                    songList.add(new Song(file.getName(),filePath));
                 }
             }
         }
     }
     //--------------------------------------
     @Bindable
-    public String getCurrentSong() {
-        return currentSong;
+    public String getCurrentSongName() {
+        return currentSongName;
     }
 
-    public void setCurrentSong(String currentSong) {
-        this.currentSong = currentSong;
+    public void setCurrentSongName(String currentSongName) {
+        this.currentSongName = currentSongName;
     }
 
     public Settings getSettings() {

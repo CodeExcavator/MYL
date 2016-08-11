@@ -16,7 +16,8 @@
         <meta-data android:name="AA_DB_VERSION" android:value="1" />
         <meta-data
             android:name="AA_MODELS"
-            android:value="com.productiveengine.myl.DomainClasses.Settings" />
+            android:value="com.productiveengine.myl.DomainClasses.Settings,
+                           com.productiveengine.myl.DomainClasses.Song" />
 
         <!--
         <meta-data android:name="DATABASE" android:value="myl.db" />
@@ -35,6 +36,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:enabled="true" android:name="com.productiveengine.myl.BLL.AudioPlayBL"></service>
     </application>
 
 </manifest>

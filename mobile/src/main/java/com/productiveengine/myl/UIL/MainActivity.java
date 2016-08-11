@@ -32,6 +32,7 @@ import android.widget.Toast;
 import com.productiveengine.myl.BLL.AudioPlayBL;
 import com.productiveengine.myl.Common.LoveCriteria;
 import com.productiveengine.myl.Common.RequestCodes;
+import com.productiveengine.myl.DomainClasses.Song;
 import com.productiveengine.myl.UIL.databinding.FragmentPlayBinding;
 import com.productiveengine.myl.UIL.databinding.FragmentSettingsBinding;
 import com.productiveengine.myl.ViewModels.PlayVM;
@@ -83,6 +84,15 @@ public class MainActivity extends AppCompatActivity {
     void doBindService() {
         bindService(new Intent(this, AudioPlayBL.class), mConnection,
                 Context.BIND_AUTO_CREATE);
+    }
+    public void playNextSong(String nextSongPath){
+        Intent intent = new Intent(this, AudioPlayBL.class);
+        Bundle b = new Bundle();
+        b.putString("songPath",nextSongPath);
+        intent.putExtras(b);
+
+        audioPlayService.onDestroy();
+        audioPlayService.startService(intent);
     }
     //----------------------------------------------------------
     public void onTargetFolderClicked(View v){
@@ -324,18 +334,12 @@ public class MainActivity extends AppCompatActivity {
         }
         //Play -------------------------------------------------------------------------------
         public void onNextClicked(View v){
+            Song song = playVM.getNextSong();
 
-            String nextSongPath = "";
-            nextSongPath = playVM.getNextSong();
-
-            Intent intent = new Intent(this.getActivity(), AudioPlayBL.class);
-            Bundle b = new Bundle();
-            b.putString("songPath",nextSongPath);
-            intent.putExtras(b);
-
-            MainActivity ma = (MainActivity) this.getActivity();
-            ma.audioPlayService.onDestroy();
-            ma.audioPlayService.startService(intent);
+            if(song != null){
+                MainActivity ma = (MainActivity) this.getActivity();
+                ma.playNextSong(song.path);
+            }
         }
         public void onRefreshSongListClicked(View v){
             playVM.refreshSongList();

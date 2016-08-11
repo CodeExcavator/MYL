@@ -36,9 +36,4 @@ public class Settings extends Model{
         super();
     }
 
-    public static List<Settings> getAll() {
-        return new Select()
-                .from(Settings.class)
-                .execute();
-    }
 }

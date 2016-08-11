@@ -13,6 +13,7 @@ import com.productiveengine.myl.BLL.SettingsBL;
 import com.productiveengine.myl.BLL.SongBL;
 import com.productiveengine.myl.DomainClasses.Settings;
 import com.productiveengine.myl.DomainClasses.Song;
+import com.productiveengine.myl.UIL.BR;
 
 import java.io.File;
 import java.io.Serializable;
@@ -67,11 +68,6 @@ public class PlayVM extends BaseObservable implements Serializable {
                 if (file.isDirectory()) {
                     traverse(file);
                 } else if(filePath.endsWith(".mp3") || filePath.endsWith(".3gp") || filePath.endsWith(".flac") || filePath.endsWith(".ogg") || filePath.endsWith(".wav") ) {
-                    /*
-                    Song song = new Song();
-                    song.path = filePath;
-                    song.name = file.getName();
-                    */
                     songList.add(new Song(file.getName(),filePath));
                 }
             }
@@ -85,6 +81,7 @@ public class PlayVM extends BaseObservable implements Serializable {
 
     public void setCurrentSongName(String currentSongName) {
         this.currentSongName = currentSongName;
+        notifyPropertyChanged(BR.currentSongName);
     }
 
     public Settings getSettings() {

@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
         b.putString("songPath",nextSongPath);
         intent.putExtras(b);
 
+        audioPlayService.applyLoveCriteria();
         audioPlayService.onDestroy();
         audioPlayService.startService(intent);
     }
@@ -386,5 +387,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 }

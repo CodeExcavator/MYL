@@ -3,6 +3,7 @@ package com.productiveengine.myl.BLL;
 import java.io.File;
 import java.io.IOException;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import android.app.Service;
 import android.content.Intent;
@@ -14,6 +15,10 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
+
+import com.productiveengine.myl.Common.FileActions;
+import com.productiveengine.myl.Common.LoveCriteria;
+import com.productiveengine.myl.DomainClasses.Settings;
 
 
 public class AudioPlayBL extends Service implements Runnable{
@@ -34,6 +39,11 @@ public class AudioPlayBL extends Service implements Runnable{
 
     private int randomHotFix = 0;
 
+    private boolean applyLoveCriteria = true;
+
+    private SongBL songBL;
+    private SettingsBL settingsBL;
+
     /**
      * Service binder
      *
@@ -53,6 +63,8 @@ public class AudioPlayBL extends Service implements Runnable{
     public void onCreate() {
         super.onCreate();
 
+        songBL = new SongBL();
+        settingsBL = new SettingsBL();
     }
 
     /**
@@ -63,6 +75,10 @@ public class AudioPlayBL extends Service implements Runnable{
         super.onDestroy();
         //Log.d(TAG, "onDestroy");
         //APTIONActivity.initialPlay = true;
+
+        if(applyLoveCriteria){
+            applyLoveCriteria = false;
+        }
         stopThread();
     }
 
@@ -188,8 +204,49 @@ public class AudioPlayBL extends Service implements Runnable{
      */
     public void updateOnCompletion(MediaPlayer mplayer)throws Exception
     {
-       //Get next song
+        //Delete song from the DB
+
+
+        if(applyLoveCriteria = true) {
+            applyLoveCriteria = false;
+        }
     }
+
+    public void applyLoveCriteria(){
+        FileActions fileActions = new FileActions();
+
+        //Delete from DB
+        songBL.deleteByPath(songPath);
+        //Apply love criteria
+        Settings settings = settingsBL.initializeSettingsFromDB();
+
+        switch (LoveCriteria.fromInt(settings.loveCriteria)){
+            case TIME_LIMIT:
+
+                break;
+            case PERCENTAGE:
+                break;
+        }
+
+        MediaPlayer.TrackInfo[] trackInfo = player.getTrackInfo();
+        int duration = player.getDuration();
+        int currentPosition = player.getCurrentPosition();
+
+        String a = String.format("%d min, %d sec",
+                TimeUnit.MILLISECONDS.toMinutes(duration),
+                TimeUnit.MILLISECONDS.toSeconds(duration) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
+        );
+
+        String b = String.format("%d min, %d sec",
+                TimeUnit.MILLISECONDS.toMinutes(currentPosition),
+                TimeUnit.MILLISECONDS.toSeconds(currentPosition) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currentPosition))
+        );
+
+
+    }
+
 
     //Setters - Getters ------------------------------------------------------------------------
     public String getSongPath() {

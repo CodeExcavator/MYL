@@ -1,10 +1,13 @@
 package com.productiveengine.myl.UIL;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
@@ -12,9 +15,11 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,9 +33,11 @@ import android.widget.Toast;
 
 import com.productiveengine.myl.BLL.AudioPlayBL;
 import com.productiveengine.myl.Common.HateCriteria;
+import com.productiveengine.myl.Common.InputFilterMinMax;
 import com.productiveengine.myl.Common.LoveCriteria;
 import com.productiveengine.myl.Common.RequestCodes;
 import com.productiveengine.myl.DomainClasses.Song;
+import com.productiveengine.myl.UIL.Services.MediaPlayerService;
 import com.productiveengine.myl.UIL.databinding.FragmentPlayBinding;
 import com.productiveengine.myl.UIL.databinding.FragmentSettingsBinding;
 import com.productiveengine.myl.ViewModels.PlayVM;
@@ -42,6 +49,7 @@ import ar.com.daidalos.afiledialog.FileChooserActivity;
 
 public class MainActivity extends AppCompatActivity {
 
+    BroadcastReceiver receiver;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -82,7 +90,8 @@ public class MainActivity extends AppCompatActivity {
         bindService(new Intent(this, AudioPlayBL.class), mConnection,
                 Context.BIND_AUTO_CREATE);
     }
-    public void playNextSong(String nextSongPath){
+    public void playNextSong(){
+        /*
         Intent intent = new Intent(this, AudioPlayBL.class);
         Bundle b = new Bundle();
         b.putString("songPath",nextSongPath);
@@ -91,6 +100,11 @@ public class MainActivity extends AppCompatActivity {
         audioPlayService.applyCriteria();
         audioPlayService.onDestroy();
         audioPlayService.startService(intent);
+        */
+
+        Intent intent = new Intent( getApplicationContext(), MediaPlayerService.class );
+        intent.setAction( MediaPlayerService.ACTION_NEXT );
+        startService( intent );
     }
     //----------------------------------------------------------
     public void onTargetFolderClicked(View v){
@@ -170,7 +184,30 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Bind with background service -----------------------------------------------
-        doBindService();
+        //doBindService();
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String s = intent.getStringExtra(MediaPlayerService.MEDIA_PLAYER_MSG);
+
+                TextView txtCurrentSong = (TextView) findViewById(R.id.txtCurrentSong);
+                txtCurrentSong.setText(s);
+            }
+        };
+
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(this).registerReceiver((receiver),
+                new IntentFilter(MediaPlayerService.MEDIA_PLAYER_RESULT)
+        );
+    }
+
+    @Override
+    protected void onStop() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+        super.onStop();
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -291,6 +328,7 @@ public class MainActivity extends AppCompatActivity {
 
                 txtLoveTimeLimit = (EditText) rootView.findViewById(R.id.txtLoveTimeLimit);
                 txtLoveTimePercentage = (EditText) rootView.findViewById(R.id.txtLoveTimePercentage);
+                //txtLoveTimePercentage.setFilters(new InputFilter[]{ new InputFilterMinMax("1", "100")});
                 //---------------------------------------------------------------------------------------
 
                 RadioButton btnHateTimeLimit = (RadioButton) rootView.findViewById(R.id.btnHateTimeLimit);
@@ -316,6 +354,7 @@ public class MainActivity extends AppCompatActivity {
 
                 txtHateTimeLimit = (EditText) rootView.findViewById(R.id.txtHateTimeLimit);
                 txtHateTimePercentage = (EditText) rootView.findViewById(R.id.txtHateTimePercentage);
+                //txtHateTimePercentage.setFilters(new InputFilter[]{ new InputFilterMinMax("1", "100")});
                 //---------------------------------------------------------------------------------------
             }
             else if(index == 1){
@@ -354,12 +393,8 @@ public class MainActivity extends AppCompatActivity {
         }
         //Play -------------------------------------------------------------------------------
         public void onNextClicked(View v){
-            Song song = playVM.getNextSong();
-
-            if(song != null){
-                MainActivity ma = (MainActivity) this.getActivity();
-                ma.playNextSong(song.path);
-            }
+            MainActivity ma = (MainActivity) this.getActivity();
+            ma.playNextSong();
         }
         public void onRefreshSongListClicked(View v){
             playVM.refreshSongList();

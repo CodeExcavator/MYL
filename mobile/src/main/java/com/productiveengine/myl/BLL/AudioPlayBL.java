@@ -1,28 +1,36 @@
 package com.productiveengine.myl.BLL;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.media.Rating;
+import android.media.session.MediaController;
+import android.media.session.MediaSession;
+import android.media.session.MediaSessionManager;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.MediaStore;
+import android.util.Log;
 
 import com.productiveengine.myl.Common.FileActions;
 import com.productiveengine.myl.Common.HateCriteria;
 import com.productiveengine.myl.Common.LoveCriteria;
 import com.productiveengine.myl.DomainClasses.Settings;
+import com.productiveengine.myl.UIL.R;
 
-import static com.productiveengine.myl.Common.HateCriteria.PERCENTAGE;
-import static com.productiveengine.myl.Common.HateCriteria.TIME_LIMIT;
+import static android.media.session.PlaybackState.ACTION_FAST_FORWARD;
+import static android.media.session.PlaybackState.ACTION_PAUSE;
+import static android.media.session.PlaybackState.ACTION_PLAY;
+import static android.media.session.PlaybackState.ACTION_REWIND;
 
 
 public class AudioPlayBL extends Service implements Runnable{
@@ -30,9 +38,22 @@ public class AudioPlayBL extends Service implements Runnable{
     @SuppressWarnings("unused")
     private static final String TAG = "AudioPlayService";
 
+    public static final String ACTION_PLAY = "action_play";
+    public static final String ACTION_PAUSE = "action_pause";
+    public static final String ACTION_REWIND = "action_rewind";
+    public static final String ACTION_FAST_FORWARD = "action_fast_foward";
+    public static final String ACTION_NEXT = "action_next";
+    public static final String ACTION_PREVIOUS = "action_previous";
+    public static final String ACTION_STOP = "action_stop";
+
     private final IBinder mBinder = new MyBinder();
     private String songPath;
-    private MediaPlayer player;
+
+    private MediaPlayer mMediaPlayer;
+    private MediaSessionManager mManager;
+    private MediaSession mSession;
+    private MediaController mController;
+
     private boolean playOrPause = true;
     private boolean stopPlay = false;
     private boolean notifySeekBar = false;
@@ -149,15 +170,15 @@ public class AudioPlayBL extends Service implements Runnable{
     }
 
     /**
-     * Kill the worker thread and the player
+     * Kill the worker thread and the mMediaPlayer
      */
     public synchronized void stopThread(){
-        if(runner != null && player!=null){
+        if(runner != null && mMediaPlayer !=null){
             Thread moribund = runner;
             runner = null;
             moribund.interrupt();
-            player.stop();
-            player.release();
+            mMediaPlayer.stop();
+            mMediaPlayer.release();
         }
 
     }
@@ -167,14 +188,15 @@ public class AudioPlayBL extends Service implements Runnable{
      */
     public void run(){
 
-        player = MediaPlayer.create(this, Uri.parse(songPath));
-        if(player == null)
+        mMediaPlayer = MediaPlayer.create(this, Uri.parse(songPath));
+
+        if(mMediaPlayer == null)
         {
             stopThread();
             return;
         }
 
-        player.setOnCompletionListener(new OnCompletionListener() {
+        mMediaPlayer.setOnCompletionListener(new OnCompletionListener() {
 
             @Override
             public void onCompletion(MediaPlayer mplayer) {
@@ -188,13 +210,13 @@ public class AudioPlayBL extends Service implements Runnable{
 
             }
         });
-        player.start();
+        mMediaPlayer.start();
 
         while(Thread.currentThread() == runner)
         {
             if(!playOrPause)
             {
-                player.pause();
+                mMediaPlayer.pause();
                 playOrPause = true;
                 notifySeekBar = false;
             }
@@ -218,13 +240,13 @@ public class AudioPlayBL extends Service implements Runnable{
 
     public void applyCriteria(){
 
-        if(player == null){ return; }
+        if(mMediaPlayer == null){ return; }
 
         FileActions fileActions = new FileActions();
 
         //Get track info
-        int duration = convertTrackTimeToSeconds(player.getDuration());
-        int currentPosition = convertTrackTimeToSeconds(player.getCurrentPosition());
+        int duration = convertTrackTimeToSeconds(mMediaPlayer.getDuration());
+        int currentPosition = convertTrackTimeToSeconds(mMediaPlayer.getCurrentPosition());
         //Delete from DB
         songBL.deleteByPath(songPath);
         //Get settings from DB
@@ -261,10 +283,6 @@ public class AudioPlayBL extends Service implements Runnable{
                 }
                 break;
         }
-
-
-
-
     }
 
     private int convertTrackTimeToSeconds(int duration){
@@ -275,6 +293,113 @@ public class AudioPlayBL extends Service implements Runnable{
                 );
     }
 
+    //PaulTR/AndroidDemoProjects
+    //https://github.com/PaulTR/AndroidDemoProjects/blob/master/MediaSessionwithMediaStyleNotification/app/src/main/java/com/ptrprograms/mediasessionwithmediastylenotification/MediaPlayerService.java
+    private Notification.Action generateAction( int icon, String title, String intentAction ) {
+        Intent intent = new Intent( getApplicationContext(), AudioPlayBL.class );
+        intent.setAction( intentAction );
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
+        return new Notification.Action.Builder( icon, title, pendingIntent ).build();
+    }
+    private void buildNotification( Notification.Action action ) {
+        Notification.MediaStyle style = new Notification.MediaStyle();
+
+        Intent intent = new Intent( getApplicationContext(), AudioPlayBL.class );
+        intent.setAction( ACTION_STOP );
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
+        Notification.Builder builder = new Notification.Builder( this )
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setContentTitle( "Media Title" )
+                .setContentText( "Media Artist" )
+                .setDeleteIntent( pendingIntent )
+                .setStyle(style);
+
+        builder.addAction( generateAction( android.R.drawable.ic_media_previous, "Previous", ACTION_PREVIOUS ) );
+        builder.addAction( generateAction( android.R.drawable.ic_media_rew, "Rewind", ACTION_REWIND ) );
+        builder.addAction( action );
+        builder.addAction( generateAction( android.R.drawable.ic_media_ff, "Fast Foward", ACTION_FAST_FORWARD ) );
+        builder.addAction( generateAction( android.R.drawable.ic_media_next, "Next", ACTION_NEXT ) );
+        style.setShowActionsInCompactView(0,1,2,3,4);
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService( Context.NOTIFICATION_SERVICE );
+        notificationManager.notify( 1, builder.build() );
+    }
+
+    private void initMediaSessions() {
+        mMediaPlayer = new MediaPlayer();
+
+        mSession = new MediaSession(getApplicationContext(), "simple player session");
+        mController =new MediaController(getApplicationContext(), mSession.getSessionToken());
+
+        mSession.setCallback(new MediaSession.Callback(){
+                                 @Override
+                                 public void onPlay() {
+                                     super.onPlay();
+                                     Log.e( "MediaPlayerService", "onPlay");
+                                     buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE ) );
+                                 }
+
+                                 @Override
+                                 public void onPause() {
+                                     super.onPause();
+                                     Log.e( "MediaPlayerService", "onPause");
+                                     buildNotification(generateAction(android.R.drawable.ic_media_play, "Play", ACTION_PLAY));
+                                 }
+
+                                 @Override
+                                 public void onSkipToNext() {
+                                     super.onSkipToNext();
+                                     Log.e( "MediaPlayerService", "onSkipToNext");
+
+                                     buildNotification( generateAction( android.R.drawable.ic_media_next, "Next", ACTION_NEXT ) );
+                                     applyCriteria();
+                                 }
+
+                                 @Override
+                                 public void onSkipToPrevious() {
+                                     super.onSkipToPrevious();
+                                     Log.e( "MediaPlayerService", "onSkipToPrevious");
+                                     //Change media here
+                                     buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE ) );
+                                 }
+
+                                 @Override
+                                 public void onFastForward() {
+                                     super.onFastForward();
+                                     Log.e( "MediaPlayerService", "onFastForward");
+                                     //Manipulate current media here
+                                 }
+
+                                 @Override
+                                 public void onRewind() {
+                                     super.onRewind();
+                                     Log.e( "MediaPlayerService", "onRewind");
+                                     //Manipulate current media here
+                                 }
+
+                                 @Override
+                                 public void onStop() {
+                                     super.onStop();
+                                     Log.e( "MediaPlayerService", "onStop");
+                                     //Stop media player here
+                                     NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                                     notificationManager.cancel( 1 );
+                                     Intent intent = new Intent( getApplicationContext(), AudioPlayBL.class );
+                                     stopService( intent );
+                                 }
+
+                                 @Override
+                                 public void onSeekTo(long pos) {
+                                     super.onSeekTo(pos);
+                                 }
+
+                                 @Override
+                                 public void onSetRating(Rating rating) {
+                                     super.onSetRating(rating);
+                                 }
+                             }
+        );
+    }
     //Setters - Getters ------------------------------------------------------------------------
     public String getSongPath() {
         return songPath;
@@ -288,11 +413,11 @@ public class AudioPlayBL extends Service implements Runnable{
     public void setPlayOrPause(boolean playOrPause) {
         this.playOrPause = playOrPause;
     }
-    public MediaPlayer getPlayer() {
-        return player;
+    public MediaPlayer getmMediaPlayer() {
+        return mMediaPlayer;
     }
-    public void setPlayer(MediaPlayer player) {
-        this.player = player;
+    public void setmMediaPlayer(MediaPlayer mMediaPlayer) {
+        this.mMediaPlayer = mMediaPlayer;
     }
     public boolean isNotifySeekBar() {
         return notifySeekBar;

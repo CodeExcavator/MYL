@@ -35,7 +35,7 @@ public class SettingsBL {
 
     public void saveData(Settings settings){
         //TODO: Try catch, error handling
-        //Log.d(settings.timeLimit+"","test");
+        //Log.d(settings.loveTimeLimit+"","test");
         settings.save();
     }
 

@@ -10,106 +10,155 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.productiveengine.myl.UIL.Settings">
-    <LinearLayout
-        android:orientation="vertical"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="top">
-
-        <TextView
-            android:layout_width="159dp"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Root folder"
-            android:id="@+id/lblRootFolder" />
-        <Button
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="..."
-            android:id="@+id/btnRootFolder"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@={settingsVM.rootFolderPath}"
-            android:id="@+id/lblRootFolderPath" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Target folder"
-            android:id="@+id/lblTargetFolder"
-            />
-        <Button
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="..."
-            android:id="@+id/btnTargetFolder"
-            />
-        <!-- android:onClick="@{settingsVM::onClickFriend}" -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@={settingsVM.targetFolderPath}"
-            android:id="@+id/lblTargetFolderPath" />
-        <RadioGroup
-            android:id="@+id/radioGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <!--   -->
-            <RadioButton
-                android:id="@+id/btnTimeLimit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text= "@string/timeLimit"
-                android:checked="@={settingsVM.timeLimitChk}"
-                />
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:text="@={`` + settingsVM.timeLimit}"
-                android:ems="10"
-                android:id="@+id/txtTimeLimit" />
-            <!--   -->
-            <RadioButton
-                android:id="@+id/btnPercentage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/timePercentage"
-                android:checked="@={!settingsVM.timeLimitChk}"
-                />
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:text="@={`` + settingsVM.timePercentage}"
-                android:ems="10"
-                android:id="@+id/txtTimePercentage" />
-        </RadioGroup>
-
-        <!--
-        <EditText
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:text="@={settingsVM.firstName}"
-            android:ems="10"
-            android:id="@+id/editText" />
+            android:layout_height="match_parent"
+            android:layout_gravity="top">
 
+            <TextView
+                android:layout_width="159dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Root folder"
+                android:id="@+id/lblRootFolder" />
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="..."
+                android:id="@+id/btnRootFolder"
+                />
 
-                <include layout="@layout/include_view"
-                    bind:dataSource="@{dataSource}">
-                </include>
-                -->
-    </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="@={settingsVM.rootFolderPath}"
+                android:id="@+id/lblRootFolderPath" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Target folder"
+                android:id="@+id/lblTargetFolder"
+                />
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="..."
+                android:id="@+id/btnTargetFolder"
+                />
+            <!-- android:onClick="@{settingsVM::onClickFriend}" -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="@={settingsVM.targetFolderPath}"
+                android:id="@+id/lblTargetFolderPath" />
 
+            <View android:id="@+id/hateDivisor"
+                android:layout_height="2dp"
+                android:layout_width="fill_parent"
+                android:background="#ffffff" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Hate criteria"
+                />
+            <RadioGroup
+                android:id="@+id/radioGroupHate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <!--   -->
+                <RadioButton
+                    android:id="@+id/btnHateTimeLimit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text= "@string/loveTimeLimit"
+                    android:checked="@={settingsVM.hateTimeLimitChk}"
+                    />
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:text="@={`` + settingsVM.hateTimeLimit}"
+                    android:ems="10"
+                    android:id="@+id/txtHateTimeLimit"
+                    android:enabled="@{settingsVM.hateTimeLimitChk}"/>
+                <!--   -->
+                <RadioButton
+                    android:id="@+id/btnHatePercentage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/loveTimePercentage"
+                    android:checked="@={!settingsVM.hateTimeLimitChk}"
+                    />
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:text="@={`` + settingsVM.hateTimePercentage}"
+                    android:ems="10"
+                    android:id="@+id/txtHateTimePercentage"
+                    android:enabled="@{!settingsVM.hateTimeLimitChk}"/>
+            </RadioGroup>
+            <!--                                                         -->
+            <!--                                                         -->
+            <View android:id="@+id/loveDivisor"
+                android:layout_height="2dp"
+                android:layout_width="fill_parent"
+                android:background="#ffffff" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Love criteria"
+                />
+            <RadioGroup
+                android:id="@+id/radioGroupLove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <RadioButton
+                    android:id="@+id/btnLoveTimeLimit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text= "@string/loveTimeLimit"
+                    android:checked="@={settingsVM.loveTimeLimitChk}"
+                    />
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:text="@={`` + settingsVM.loveTimeLimit}"
+                    android:ems="10"
+                    android:id="@+id/txtLoveTimeLimit"
+                    android:enabled="@{settingsVM.loveTimeLimitChk}"/>
+                <!--   -->
+                <RadioButton
+                    android:id="@+id/btnLovePercentage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/loveTimePercentage"
+                    android:checked="@={!settingsVM.loveTimeLimitChk}"
+                    />
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:text="@={`` + settingsVM.loveTimePercentage}"
+                    android:ems="10"
+                    android:id="@+id/txtLoveTimePercentage"
+                    android:enabled="@{!settingsVM.loveTimeLimitChk}"/>
+            </RadioGroup>
+        </LinearLayout>
+    </ScrollView>
 </FrameLayout>
 
 </layout>

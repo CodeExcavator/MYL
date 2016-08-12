@@ -17,8 +17,12 @@ import android.os.IBinder;
 import android.provider.MediaStore;
 
 import com.productiveengine.myl.Common.FileActions;
+import com.productiveengine.myl.Common.HateCriteria;
 import com.productiveengine.myl.Common.LoveCriteria;
 import com.productiveengine.myl.DomainClasses.Settings;
+
+import static com.productiveengine.myl.Common.HateCriteria.PERCENTAGE;
+import static com.productiveengine.myl.Common.HateCriteria.TIME_LIMIT;
 
 
 public class AudioPlayBL extends Service implements Runnable{
@@ -212,41 +216,64 @@ public class AudioPlayBL extends Service implements Runnable{
         }
     }
 
-    public void applyLoveCriteria(){
+    public void applyCriteria(){
+
+        if(player == null){ return; }
+
         FileActions fileActions = new FileActions();
 
+        //Get track info
+        int duration = convertTrackTimeToSeconds(player.getDuration());
+        int currentPosition = convertTrackTimeToSeconds(player.getCurrentPosition());
         //Delete from DB
         songBL.deleteByPath(songPath);
-        //Apply love criteria
+        //Get settings from DB
         Settings settings = settingsBL.initializeSettingsFromDB();
+        //Apply hate
+        switch (HateCriteria.fromInt(settings.hateCriteria)){
+            case TIME_LIMIT:
+                if(settings.hateTimeLimit > currentPosition){
+                    fileActions.deleteFile(songPath,"");
+                }
+                break;
+            case PERCENTAGE:
+                double completionPercentage = (((double) currentPosition) / duration)  * 100 ;
+
+                if(settings.hateTimePercentage > completionPercentage ){
+                    fileActions.deleteFile(songPath,"");
+                }
+                break;
+        }
+        //Apply love
+        File songFile = new File(songPath);
 
         switch (LoveCriteria.fromInt(settings.loveCriteria)){
             case TIME_LIMIT:
-
+                if(settings.loveTimeLimit < currentPosition){
+                    fileActions.moveFile(songFile.getPath(),songFile.getName(),settings.targetFolderPath);
+                }
                 break;
             case PERCENTAGE:
+                double completionPercentage = (((double) currentPosition) / duration)  * 100 ;
+
+                if(settings.loveTimePercentage > currentPosition){
+                    fileActions.moveFile(songFile.getPath(),songFile.getName(),settings.targetFolderPath);
+                }
                 break;
         }
 
-        MediaPlayer.TrackInfo[] trackInfo = player.getTrackInfo();
-        int duration = player.getDuration();
-        int currentPosition = player.getCurrentPosition();
 
-        String a = String.format("%d min, %d sec",
-                TimeUnit.MILLISECONDS.toMinutes(duration),
-                TimeUnit.MILLISECONDS.toSeconds(duration) -
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
-        );
-
-        String b = String.format("%d min, %d sec",
-                TimeUnit.MILLISECONDS.toMinutes(currentPosition),
-                TimeUnit.MILLISECONDS.toSeconds(currentPosition) -
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currentPosition))
-        );
 
 
     }
 
+    private int convertTrackTimeToSeconds(int duration){
+        return (int) TimeUnit.MILLISECONDS.toMinutes(duration) * 60 +
+                (int)(
+                        TimeUnit.MILLISECONDS.toSeconds(duration) -
+                        (int)TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
+                );
+    }
 
     //Setters - Getters ------------------------------------------------------------------------
     public String getSongPath() {

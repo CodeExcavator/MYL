@@ -5,15 +5,12 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -30,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.productiveengine.myl.BLL.AudioPlayBL;
+import com.productiveengine.myl.Common.HateCriteria;
 import com.productiveengine.myl.Common.LoveCriteria;
 import com.productiveengine.myl.Common.RequestCodes;
 import com.productiveengine.myl.DomainClasses.Song;
@@ -39,7 +37,6 @@ import com.productiveengine.myl.ViewModels.PlayVM;
 import com.productiveengine.myl.ViewModels.SettingsVM;
 
 import java.io.File;
-import java.util.List;
 
 import ar.com.daidalos.afiledialog.FileChooserActivity;
 
@@ -91,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         b.putString("songPath",nextSongPath);
         intent.putExtras(b);
 
-        audioPlayService.applyLoveCriteria();
+        audioPlayService.applyCriteria();
         audioPlayService.onDestroy();
         audioPlayService.startService(intent);
     }
@@ -227,10 +224,10 @@ public class MainActivity extends AppCompatActivity {
         FragmentPlayBinding fragmentPlayBinding;
         PlayVM playVM;
 
-        TextView txtTest;
-
-        EditText txtTimeLimit;
-        EditText txtTimePercentage;
+        EditText txtLoveTimeLimit;
+        EditText txtLoveTimePercentage;
+        EditText txtHateTimeLimit;
+        EditText txtHateTimePercentage;
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -270,10 +267,10 @@ public class MainActivity extends AppCompatActivity {
                         onTargetFolderClicked(v);
                     }
                 });
-
-                RadioButton btnTimeLimit = (RadioButton) rootView.findViewById(R.id.btnTimeLimit);
-                btnTimeLimit.setChecked(true);
-                btnTimeLimit.setOnClickListener(new View.OnClickListener()
+                //---------------------------------------------------------------------------------------
+                RadioButton btnLoveTimeLimit = (RadioButton) rootView.findViewById(R.id.btnLoveTimeLimit);
+                btnLoveTimeLimit.setChecked(true);
+                btnLoveTimeLimit.setOnClickListener(new View.OnClickListener()
                 {
                     @Override
                     public void onClick(View v)
@@ -282,8 +279,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-                RadioButton btnPercentage = (RadioButton) rootView.findViewById(R.id.btnPercentage);
-                btnPercentage.setOnClickListener(new View.OnClickListener()
+                RadioButton btnLovePercentage = (RadioButton) rootView.findViewById(R.id.btnLovePercentage);
+                btnLovePercentage.setOnClickListener(new View.OnClickListener()
                 {
                     @Override
                     public void onClick(View v)
@@ -292,9 +289,34 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-                txtTimeLimit = (EditText) rootView.findViewById(R.id.txtTimeLimit);
-                txtTimePercentage = (EditText) rootView.findViewById(R.id.txtTimePercentage);
-                txtTimePercentage.setEnabled(false);
+                txtLoveTimeLimit = (EditText) rootView.findViewById(R.id.txtLoveTimeLimit);
+                txtLoveTimePercentage = (EditText) rootView.findViewById(R.id.txtLoveTimePercentage);
+                //---------------------------------------------------------------------------------------
+
+                RadioButton btnHateTimeLimit = (RadioButton) rootView.findViewById(R.id.btnHateTimeLimit);
+                btnHateTimeLimit.setChecked(true);
+                btnHateTimeLimit.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        onHateCriteriaChanged(v);
+                    }
+                });
+
+                RadioButton btnHatePercentage = (RadioButton) rootView.findViewById(R.id.btnHatePercentage);
+                btnHatePercentage.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        onHateCriteriaChanged(v);
+                    }
+                });
+
+                txtHateTimeLimit = (EditText) rootView.findViewById(R.id.txtHateTimeLimit);
+                txtHateTimePercentage = (EditText) rootView.findViewById(R.id.txtHateTimePercentage);
+                //---------------------------------------------------------------------------------------
             }
             else if(index == 1){
                 //-------------------------------------------------------------------------
@@ -305,9 +327,6 @@ public class MainActivity extends AppCompatActivity {
                 playVM = new PlayVM();
                 fragmentPlayBinding.setPlayVM(playVM);
                 rootView = fragmentPlayBinding.getRoot();
-
-
-                txtTest = (TextView) rootView.findViewById(R.id.txtTest);
 
                 View settingsView = inflater.inflate(R.layout.fragment_settings, container, false);
                 //txtTest.setText(settingsView.getContext(). .getRootFolder());
@@ -363,27 +382,49 @@ public class MainActivity extends AppCompatActivity {
             boolean checked = ((RadioButton) v).isChecked();
 
             switch(v.getId()) {
-                case R.id.btnTimeLimit:
+                case R.id.btnLoveTimeLimit:
                     if (checked){
                         settingsVM.setLoveCriteria(LoveCriteria.TIME_LIMIT);
 
-                        txtTimeLimit.setEnabled(true);
-                        txtTimePercentage.setEnabled(false);
-                        settingsVM.setTimePercentage(0);
-                        settingsVM.setTimeLimitChk(true);
+                        txtLoveTimeLimit.setEnabled(true);
+                        txtLoveTimePercentage.setEnabled(false);
+                        settingsVM.setLoveTimePercentage(0);
+                        settingsVM.setLoveTimeLimitChk(true);
                     }
                 break;
 
-                case R.id.btnPercentage:
+                case R.id.btnLovePercentage:
                     if (checked){
                         settingsVM.setLoveCriteria(LoveCriteria.PERCENTAGE);
 
-                        txtTimeLimit.setEnabled(false);
-                        txtTimePercentage.setEnabled(true);
-                        settingsVM.setTimeLimit(0);
-                        settingsVM.setTimeLimitChk(false);
+                        txtLoveTimeLimit.setEnabled(false);
+                        txtLoveTimePercentage.setEnabled(true);
+                        settingsVM.setLoveTimeLimit(0);
+                        settingsVM.setLoveTimeLimitChk(false);
                     }
                 break;
+            }
+        }
+        public void onHateCriteriaChanged(View v) {
+
+            boolean checked = ((RadioButton) v).isChecked();
+
+            switch(v.getId()) {
+                case R.id.btnHateTimeLimit:
+                    if (checked){
+                        settingsVM.setHateCriteria(HateCriteria.TIME_LIMIT);
+                        settingsVM.setHateTimePercentage(0);
+                        settingsVM.setHateTimeLimitChk(true);
+                    }
+                    break;
+
+                case R.id.btnHatePercentage:
+                    if (checked){
+                        settingsVM.setHateCriteria(HateCriteria.PERCENTAGE);
+                        settingsVM.setHateTimeLimit(0);
+                        settingsVM.setHateTimeLimitChk(false);
+                    }
+                    break;
             }
         }
     }

@@ -17,7 +17,7 @@ import java.io.OutputStream;
 
 public class FileActions {
 
-    private void moveFile(String inputPath, String inputFile, String outputPath) {
+    public void moveFile(String inputPath, String inputFile, String outputPath) {
 
         InputStream in = null;
         OutputStream out = null;
@@ -62,7 +62,7 @@ public class FileActions {
 
     }
 
-    private void deleteFile(String inputPath, String inputFile) {
+    public void deleteFile(String inputPath, String inputFile) {
         try {
             // delete the original file
             new File(inputPath + inputFile).delete();
@@ -74,7 +74,7 @@ public class FileActions {
         }
     }
 
-    private void copyFile(String inputPath, String inputFile, String outputPath) {
+    public void copyFile(String inputPath, String inputFile, String outputPath) {
 
         InputStream in = null;
         OutputStream out = null;

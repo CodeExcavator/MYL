@@ -4,6 +4,7 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 
 import com.productiveengine.myl.BLL.SettingsBL;
+import com.productiveengine.myl.Common.HateCriteria;
 import com.productiveengine.myl.Common.LoveCriteria;
 import com.productiveengine.myl.DomainClasses.Settings;
 import com.productiveengine.myl.UIL.BR;
@@ -17,19 +18,27 @@ public class SettingsVM  extends BaseObservable implements Serializable{
     private String targetFolderPath;
     private String rootFolder;
     private String targetFolder;
-
+    //--------------------------------------------
+    private HateCriteria hateCriteria;
+    private int hateTimeLimit;
+    private int hateTimePercentage;
+    //--------------------------------------------
     private LoveCriteria loveCriteria;
-    private int timeLimit;
-    private int timePercentage;
-
+    private int loveTimeLimit;
+    private int loveTimePercentage;
+    //----------------------------------------------
     private boolean screenOn;
 
     private SettingsBL settingsBL;
 
     //-------------------------------
-    private boolean timeLimitChk;
+    private boolean hateTimeLimitChk;
+    private boolean loveTimeLimitChk;
 
     public SettingsVM() {
+        initialize();
+    }
+    private void initialize(){
         settingsBL = new SettingsBL();
         settings = settingsBL.initializeSettingsFromDB();
 
@@ -38,47 +47,68 @@ public class SettingsVM  extends BaseObservable implements Serializable{
         targetFolderPath = settings.targetFolderPath;
         rootFolder = settings.rootFolder;
         targetFolder = settings.targetFolder;
-
+        //----------------------------------------------
         loveCriteria = LoveCriteria.fromInt(settings.loveCriteria);
 
         switch (loveCriteria){
             case TIME_LIMIT:
-                timeLimitChk = true;
+                setLoveTimeLimitChk(true);
                 break;
             case PERCENTAGE:
-                timeLimitChk = false;
+                setLoveTimeLimitChk(false);
                 break;
             default:
-                timeLimitChk = true;
+                setLoveTimeLimitChk(true);
         }
 
-        timeLimit = settings.timeLimit;
-        timePercentage = settings.timePercentage;
+        loveTimeLimit = settings.loveTimeLimit;
+        loveTimePercentage = settings.loveTimePercentage;
+        //----------------------------------------------
+        hateCriteria = HateCriteria.fromInt(settings.hateCriteria);
 
+        switch (hateCriteria){
+            case TIME_LIMIT:
+                setHateTimeLimitChk(true);
+                break;
+            case PERCENTAGE:
+                setHateTimeLimitChk(false);
+                break;
+            default:
+                setHateTimeLimitChk(true);
+        }
+
+        hateTimeLimit = settings.hateTimeLimit;
+        hateTimePercentage = settings.hateTimePercentage;
+        //----------------------------------------------
         screenOn = settings.screenOn;
         //----------------------------------------------
     }
-
     private void notifyAndSave(int fieldId){
         //--------------------------------------------
         settings.rootFolderPath = rootFolderPath;
         settings.targetFolderPath = targetFolderPath;
         settings.rootFolder = rootFolder;
         settings.targetFolder = targetFolder;
-
+        //--------------------------------------------
+        if(hateCriteria != null) {
+            settings.hateCriteria = hateCriteria.ordinal();
+        }
+        settings.hateTimeLimit = hateTimeLimit;
+        settings.hateTimePercentage = hateTimePercentage;
+        //--------------------------------------------
         if(loveCriteria != null) {
             settings.loveCriteria = loveCriteria.ordinal();
         }
-        settings.timeLimit = timeLimit;
-        settings.timePercentage = timePercentage;
-
-        settings.screenOn = screenOn;
+        settings.loveTimeLimit = loveTimeLimit;
+        settings.loveTimePercentage = loveTimePercentage;
         //--------------------------------------------
+        settings.screenOn = screenOn;
 
         settingsBL.saveData(settings);
         notifyPropertyChanged(fieldId);
     }
 
+    //--------------------------------------------
     //Setters getters
     @Bindable
     public String getRootFolderPath() {
@@ -131,23 +161,23 @@ public class SettingsVM  extends BaseObservable implements Serializable{
     }
 
     @Bindable
-    public int getTimeLimit() {
-        return timeLimit;
+    public int getLoveTimeLimit() {
+        return loveTimeLimit;
     }
 
-    public void setTimeLimit(int timeLimit) {
-        this.timeLimit = timeLimit;
-        notifyAndSave(BR.timeLimit);
+    public void setLoveTimeLimit(int loveTimeLimit) {
+        this.loveTimeLimit = loveTimeLimit;
+        notifyAndSave(BR.loveTimeLimit);
     }
 
     @Bindable
-    public int getTimePercentage() {
-        return timePercentage;
+    public int getLoveTimePercentage() {
+        return loveTimePercentage;
     }
 
-    public void setTimePercentage(int timePercentage) {
-        this.timePercentage = timePercentage;
-        notifyAndSave(BR.timePercentage);
+    public void setLoveTimePercentage(int loveTimePercentage) {
+        this.loveTimePercentage = loveTimePercentage;
+        notifyAndSave(BR.loveTimePercentage);
     }
 
     @Bindable
@@ -161,11 +191,52 @@ public class SettingsVM  extends BaseObservable implements Serializable{
     }
 
     @Bindable
-    public boolean isTimeLimitChk() {
-        return timeLimitChk;
+    public boolean isLoveTimeLimitChk() {
+        return loveTimeLimitChk;
     }
 
-    public void setTimeLimitChk(boolean timeLimitChk) {
-        this.timeLimitChk = timeLimitChk;
+    public void setLoveTimeLimitChk(boolean loveTimeLimitChk) {
+        this.loveTimeLimitChk = loveTimeLimitChk;
+        notifyPropertyChanged(BR.loveTimeLimitChk);
+    }
+
+    @Bindable
+    public HateCriteria getHateCriteria() {
+        return hateCriteria;
+    }
+
+    public void setHateCriteria(HateCriteria hateCriteria) {
+        this.hateCriteria = hateCriteria;
+        notifyAndSave(BR.hateCriteria);
+    }
+
+    @Bindable
+    public int getHateTimeLimit() {
+        return hateTimeLimit;
+    }
+
+    public void setHateTimeLimit(int hateTimeLimit) {
+        this.hateTimeLimit = hateTimeLimit;
+        notifyAndSave(BR.hateTimeLimit);
+    }
+
+    @Bindable
+    public int getHateTimePercentage() {
+        return hateTimePercentage;
+    }
+
+    public void setHateTimePercentage(int hateTimePercentage) {
+        this.hateTimePercentage = hateTimePercentage;
+        notifyAndSave(BR.hateTimePercentage);
+    }
+
+    @Bindable
+    public boolean isHateTimeLimitChk() {
+        return hateTimeLimitChk;
+    }
+
+    public void setHateTimeLimitChk(boolean hateTimeLimitChk) {
+        this.hateTimeLimitChk = hateTimeLimitChk;
+        notifyPropertyChanged(BR.hateTimeLimitChk);
     }
 }

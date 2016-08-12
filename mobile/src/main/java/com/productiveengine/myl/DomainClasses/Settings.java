@@ -23,12 +23,21 @@ public class Settings extends Model{
     public String rootFolder;
     @Column(name = "TargetFolder")
     public String targetFolder;
+    //------------------------------
+    @Column(name = "HateCriteria")
+    public int hateCriteria;
+    @Column(name = "HateTimeLimit")
+    public int hateTimeLimit;
+    @Column(name = "HateTimePercentage")
+    public int hateTimePercentage;
+    //-----------------------------
     @Column(name = "LoveCriteria")
     public int loveCriteria;
-    @Column(name = "TimeLimit")
-    public int timeLimit;
-    @Column(name = "TimePercentage")
-    public int timePercentage;
+    @Column(name = "LoveTimeLimit")
+    public int loveTimeLimit;
+    @Column(name = "LoveTimePercentage")
+    public int loveTimePercentage;
+    //------------------------------
     @Column(name = "ScreenOn")
     public boolean screenOn;
 

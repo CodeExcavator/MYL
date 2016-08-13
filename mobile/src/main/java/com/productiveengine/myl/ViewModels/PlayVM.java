@@ -26,7 +26,6 @@ import java.util.List;
 
 public class PlayVM extends BaseObservable implements Serializable {
 
-    private String currentSongName;
     private Settings settings;
     private SongBL songBL;
     private List<Song> songList;
@@ -35,15 +34,6 @@ public class PlayVM extends BaseObservable implements Serializable {
 
     public PlayVM(){
         songBL = new SongBL();
-    }
-
-    public Song getNextSong(){
-        currentSong = songBL.fetchNextSong();
-
-        if(currentSong != null){
-            setCurrentSongName(currentSong.name);
-        }
-        return currentSong;
     }
 
     public void refreshSongList(){
@@ -74,16 +64,6 @@ public class PlayVM extends BaseObservable implements Serializable {
         }
     }
     //--------------------------------------
-    @Bindable
-    public String getCurrentSongName() {
-        return currentSongName;
-    }
-
-    public void setCurrentSongName(String currentSongName) {
-        this.currentSongName = currentSongName;
-        notifyPropertyChanged(BR.currentSongName);
-    }
-
     public Settings getSettings() {
         return settings;
     }

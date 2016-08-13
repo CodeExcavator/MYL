@@ -39,7 +39,7 @@
             </intent-filter>
         </activity>
 
-        <service android:enabled="true" android:name="com.productiveengine.myl.BLL.AudioPlayBL"></service>
+        <service android:enabled="false" android:name="com.productiveengine.myl.BLL.AudioPlayBL"></service>
         <service android:enabled="true" android:name="com.productiveengine.myl.UIL.Services.MediaPlayerService"></service>
     </application>
 

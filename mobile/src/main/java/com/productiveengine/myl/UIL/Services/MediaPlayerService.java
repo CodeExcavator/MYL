@@ -17,15 +17,30 @@ import android.media.Rating;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.MediaSessionManager;
+import android.net.Uri;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import com.productiveengine.myl.BLL.SettingsBL;
+import com.productiveengine.myl.BLL.SongBL;
+import com.productiveengine.myl.Common.FileActions;
+import com.productiveengine.myl.Common.HateCriteria;
+import com.productiveengine.myl.Common.LoveCriteria;
+import com.productiveengine.myl.DomainClasses.Settings;
+import com.productiveengine.myl.DomainClasses.Song;
 import com.productiveengine.myl.UIL.R;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by paulruiz on 10/28/14.
  */
 public class MediaPlayerService extends Service {
+
+    private static final String TAG = MediaPlayerService.class.getName();
 
     public static final String ACTION_PLAY = "action_play";
     public static final String ACTION_PAUSE = "action_pause";
@@ -40,6 +55,10 @@ public class MediaPlayerService extends Service {
     private MediaSession mSession;
     private MediaController mController;
 
+    private SettingsBL settingsBL;
+    private SongBL songBL;
+    private String currentSongPath;
+
     LocalBroadcastManager broadcaster;
     static final public String MEDIA_PLAYER_RESULT = "com.productiveengine.myl.UIL.Services.MediaPlayerService.REQUEST_PROCESSED";
     static final public String MEDIA_PLAYER_MSG = "com.productiveengine.myl.UIL.Services.MediaPlayerService.MEDIA_PLAYER_MSG";
@@ -53,11 +72,86 @@ public class MediaPlayerService extends Service {
 
     @Override
     public void onCreate() {
+
         broadcaster = LocalBroadcastManager.getInstance(this);
+        settingsBL = new SettingsBL();
+        songBL = new SongBL();
+    }
+
+    private boolean applyCriteria(MediaPlayer player, String currentSongPath){
+
+        boolean ok = false;
+        boolean songDeleted = false;
+
+        if(player == null || currentSongPath == null){
+            return ok;
+        }
+
+        FileActions fileActions = new FileActions();
+
+        try {
+            //Get track info
+            int duration = convertTrackTimeToSeconds(player.getDuration());
+            int currentPosition = convertTrackTimeToSeconds(player.getCurrentPosition());
+
+            File songFile = new File(currentSongPath);
+            //Delete from DB
+            songBL.deleteByPath(currentSongPath);
+            //Get settings from DB
+            Settings settings = settingsBL.initializeSettingsFromDB();
+            //Apply hate
+            switch (HateCriteria.fromInt(settings.hateCriteria)) {
+                case TIME_LIMIT:
+                    if (settings.hateTimeLimit > currentPosition) {
+                        fileActions.deleteFile(songFile.getParent(), songFile.getName());
+                        songDeleted = true;
+                    }
+                    break;
+                case PERCENTAGE:
+                    double completionPercentage = (((double) currentPosition) / duration) * 100;
+
+                    if (settings.hateTimePercentage > completionPercentage) {
+                        fileActions.deleteFile(songFile.getParent(), songFile.getName());
+                        songDeleted = true;
+                    }
+                    break;
+            }
+            //Apply love
+            if(!songDeleted) {
+                switch (LoveCriteria.fromInt(settings.loveCriteria)) {
+                    case TIME_LIMIT:
+                        if (settings.loveTimeLimit < currentPosition) {
+                            fileActions.moveFile(songFile.getParent(), songFile.getName(), settings.targetFolderPath);
+                        }
+                        break;
+                    case PERCENTAGE:
+                        double completionPercentage = (((double) currentPosition) / duration) * 100;
+
+                        if (settings.loveTimePercentage < currentPosition) {
+                            fileActions.moveFile(songFile.getParent(), songFile.getName(), settings.targetFolderPath);
+                        }
+                        break;
+                }
+            }
+            ok = true;
+        }
+        catch (Exception ex){
+            Log.e(TAG,ex.getMessage());
+        }
+        return ok;
+    }
+
+    private int convertTrackTimeToSeconds(int duration){
+        return (int) TimeUnit.MILLISECONDS.toMinutes(duration) * 60 +
+                (int)(
+                        TimeUnit.MILLISECONDS.toSeconds(duration) -
+                                (int)TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
+                );
     }
 
     @Override
     public IBinder onBind(Intent intent) {
+
         return null;
     }
 
@@ -126,16 +220,21 @@ public class MediaPlayerService extends Service {
     }
 
     private void initMediaSessions() {
-        mMediaPlayer = new MediaPlayer();
-
         mSession = new MediaSession(getApplicationContext(), "simple player session");
-        mController =new MediaController(getApplicationContext(), mSession.getSessionToken());
+        mController = new MediaController(getApplicationContext(), mSession.getSessionToken());
 
         mSession.setCallback(new MediaSession.Callback(){
              @Override
              public void onPlay() {
                  super.onPlay();
                  Log.e( "MediaPlayerService", "onPlay");
+
+                 if(mMediaPlayer != null && mMediaPlayer.isPlaying()){
+                     mMediaPlayer.stop();
+                 }
+                 mMediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(currentSongPath));
+                 mMediaPlayer.start();
+
                  buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE ) );
              }
 
@@ -143,6 +242,7 @@ public class MediaPlayerService extends Service {
              public void onPause() {
                  super.onPause();
                  Log.e( "MediaPlayerService", "onPause");
+                 mMediaPlayer.pause();
                  buildNotification(generateAction(android.R.drawable.ic_media_play, "Play", ACTION_PLAY));
              }
 
@@ -150,10 +250,20 @@ public class MediaPlayerService extends Service {
              public void onSkipToNext() {
                  super.onSkipToNext();
                  Log.e( "MediaPlayerService", "onSkipToNext");
-                 //Change media here
-                 buildNotification( generateAction( android.R.drawable.ic_media_next, "Next", ACTION_NEXT ) );
 
-                 sendResult("TEEEST!!");
+
+                 applyCriteria(mMediaPlayer, currentSongPath);
+                 Song song = songBL.fetchNextSong();
+
+                 if(song != null && song.name != null && song.name.trim().length() > 0){
+                     currentSongPath = song.path;
+                     sendResult(song.name);
+                     onPlay();
+                 }
+                 else{
+                     sendResult("Song list is empty!");
+                 }
+                 buildNotification( generateAction( android.R.drawable.ic_media_next, "Next", ACTION_NEXT ) );
              }
 
              @Override
@@ -182,7 +292,8 @@ public class MediaPlayerService extends Service {
              public void onStop() {
                  super.onStop();
                  Log.e( "MediaPlayerService", "onStop");
-                 //Stop media player here
+                 mMediaPlayer.stop();
+
                  NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
                  notificationManager.cancel( 1 );
                  Intent intent = new Intent( getApplicationContext(), MediaPlayerService.class );
@@ -206,5 +317,13 @@ public class MediaPlayerService extends Service {
     public boolean onUnbind(Intent intent) {
         mSession.release();
         return super.onUnbind(intent);
+    }
+
+    public String getCurrentSongPath() {
+        return currentSongPath;
+    }
+
+    public void setCurrentSongPath(String currentSongPath) {
+        this.currentSongPath = currentSongPath;
     }
 }

@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
@@ -19,7 +18,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,10 +31,8 @@ import android.widget.Toast;
 
 import com.productiveengine.myl.BLL.AudioPlayBL;
 import com.productiveengine.myl.Common.HateCriteria;
-import com.productiveengine.myl.Common.InputFilterMinMax;
 import com.productiveengine.myl.Common.LoveCriteria;
 import com.productiveengine.myl.Common.RequestCodes;
-import com.productiveengine.myl.DomainClasses.Song;
 import com.productiveengine.myl.UIL.Services.MediaPlayerService;
 import com.productiveengine.myl.UIL.databinding.FragmentPlayBinding;
 import com.productiveengine.myl.UIL.databinding.FragmentSettingsBinding;
@@ -90,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         bindService(new Intent(this, AudioPlayBL.class), mConnection,
                 Context.BIND_AUTO_CREATE);
     }
-    public void playNextSong(){
+    public void informAudioService(String action){
         /*
         Intent intent = new Intent(this, AudioPlayBL.class);
         Bundle b = new Bundle();
@@ -103,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         */
 
         Intent intent = new Intent( getApplicationContext(), MediaPlayerService.class );
-        intent.setAction( MediaPlayerService.ACTION_NEXT );
+        intent.setAction( action );
         startService( intent );
     }
     //----------------------------------------------------------
@@ -370,6 +366,25 @@ public class MainActivity extends AppCompatActivity {
                 View settingsView = inflater.inflate(R.layout.fragment_settings, container, false);
                 //txtTest.setText(settingsView.getContext(). .getRootFolder());
 
+                Button btnPlay = (Button) rootView.findViewById(R.id.btnPlay);
+                btnPlay.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        onPlayClicked(v);
+                    }
+                });
+
+                Button btnPause = (Button) rootView.findViewById(R.id.btnPause);
+                btnPause.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        onPauseClicked(v);
+                    }
+                });
                 Button btnNext = (Button) rootView.findViewById(R.id.btnNext);
                 btnNext.setOnClickListener(new View.OnClickListener()
                 {
@@ -392,9 +407,17 @@ public class MainActivity extends AppCompatActivity {
             return rootView;
         }
         //Play -------------------------------------------------------------------------------
+        public void onPlayClicked(View v){
+            MainActivity ma = (MainActivity) this.getActivity();
+            ma.informAudioService(MediaPlayerService.ACTION_PLAY);
+        }
+        public void onPauseClicked(View v){
+            MainActivity ma = (MainActivity) this.getActivity();
+            ma.informAudioService(MediaPlayerService.ACTION_PAUSE);
+        }
         public void onNextClicked(View v){
             MainActivity ma = (MainActivity) this.getActivity();
-            ma.playNextSong();
+            ma.informAudioService(MediaPlayerService.ACTION_NEXT);
         }
         public void onRefreshSongListClicked(View v){
             playVM.refreshSongList();

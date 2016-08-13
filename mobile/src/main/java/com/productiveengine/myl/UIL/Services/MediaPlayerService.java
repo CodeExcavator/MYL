@@ -10,15 +10,19 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Rating;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.MediaSessionManager;
+import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -29,6 +33,7 @@ import com.productiveengine.myl.Common.HateCriteria;
 import com.productiveengine.myl.Common.LoveCriteria;
 import com.productiveengine.myl.DomainClasses.Settings;
 import com.productiveengine.myl.DomainClasses.Song;
+import com.productiveengine.myl.UIL.BroadcastReceivers.RemoteControlReceiver;
 import com.productiveengine.myl.UIL.R;
 
 import java.io.File;
@@ -76,6 +81,9 @@ public class MediaPlayerService extends Service {
         broadcaster = LocalBroadcastManager.getInstance(this);
         settingsBL = new SettingsBL();
         songBL = new SongBL();
+
+        //AudioManager manager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        //manager.registerMediaButtonEventReceiver(RemoteControlReceiver);
     }
 
     private boolean applyCriteria(MediaPlayer player, String currentSongPath){
@@ -221,20 +229,36 @@ public class MediaPlayerService extends Service {
 
     private void initMediaSessions() {
         mSession = new MediaSession(getApplicationContext(), "simple player session");
+        mSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+        mSession.setActive(true);
+
+        PlaybackState state = new PlaybackState.Builder()
+                .setActions(
+                        PlaybackState.ACTION_PLAY | PlaybackState.ACTION_PLAY_PAUSE |
+                                PlaybackState.ACTION_PLAY_FROM_MEDIA_ID | PlaybackState.ACTION_PAUSE |
+                                PlaybackState.ACTION_SKIP_TO_NEXT | PlaybackState.ACTION_SKIP_TO_PREVIOUS)
+                .setState(PlaybackState.STATE_PLAYING, 0, 1, SystemClock.elapsedRealtime())
+                .build();
+        mSession.setPlaybackState(state);
+
         mController = new MediaController(getApplicationContext(), mSession.getSessionToken());
 
+
         mSession.setCallback(new MediaSession.Callback(){
+            @Override
+            public boolean onMediaButtonEvent(final Intent mediaButtonIntent) {
+                Log.i(TAG, "GOT EVENT");
+                return super.onMediaButtonEvent(mediaButtonIntent);
+            }
+
              @Override
              public void onPlay() {
                  super.onPlay();
                  Log.e( "MediaPlayerService", "onPlay");
 
-                 if(mMediaPlayer != null && mMediaPlayer.isPlaying()){
-                     mMediaPlayer.stop();
+                 if(mMediaPlayer != null && !mMediaPlayer.isPlaying()){
+                     mMediaPlayer.start();
                  }
-                 mMediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(currentSongPath));
-                 mMediaPlayer.start();
-
                  buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE ) );
              }
 
@@ -251,14 +275,19 @@ public class MediaPlayerService extends Service {
                  super.onSkipToNext();
                  Log.e( "MediaPlayerService", "onSkipToNext");
 
-
                  applyCriteria(mMediaPlayer, currentSongPath);
                  Song song = songBL.fetchNextSong();
 
                  if(song != null && song.name != null && song.name.trim().length() > 0){
                      currentSongPath = song.path;
                      sendResult(song.name);
-                     onPlay();
+
+                     if(mMediaPlayer != null && mMediaPlayer.isPlaying()){
+                         mMediaPlayer.stop();
+                     }
+                     mMediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(currentSongPath));
+                     mMediaPlayer.start();
+
                  }
                  else{
                      sendResult("Song list is empty!");

@@ -28,7 +28,12 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/btnRefreshSongList"
                 />
-
+            <Button
+                android:text="Play"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnPlay"
+                android:layout_weight="0.15" />
             <Button
                 android:text="Pause"
                 android:layout_width="match_parent"

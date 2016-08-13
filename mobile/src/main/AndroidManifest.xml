@@ -28,6 +28,12 @@
         <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="com.productiveengine.myl.DomainClasses" />
         -->
 
+        <receiver android:name="com.productiveengine.myl.UIL.BroadcastReceivers.RemoteControlReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"

@@ -33,7 +33,7 @@ public class FileActions {
                 dir.mkdirs();
             }
             else{
-                fullOutputPath = fixSameNameFiles(fullOutputPath);
+                fullOutputPath = fixSameNameFiles(outputPath, inputFile);
             }
 
             in = new FileInputStream(fullInputPath);
@@ -118,16 +118,60 @@ public class FileActions {
             Log.e(TAG, e.getMessage());
         }
     }
-    private String fixSameNameFiles(String path){
+    private String fixSameNameFiles(String path, String name){
         String outputPath = "";
 
-        File file = new File(path);
+        File file = new File(path +"/" + name);
 
         if(file.exists()){
-            //outputPath = fixSameNameFiles(path)
+
+            String fileName;
+            String fileNameExt;
+            int fileNameExtPos = name.lastIndexOf(".");
+
+            if (fileNameExtPos >= 0 )
+            {
+                fileName = name.substring(0,fileNameExtPos);
+                fileNameExt = name.substring(fileNameExtPos, name.length());
+            }
+            else{
+                fileName = name;
+                fileNameExt = "";
+            }
+
+            String[] nameSplit = fileName.split("_");
+
+            if(nameSplit.length == 1){
+                fileName = fileName +"_1";
+            }
+            else{
+                // _X
+                String incrementS = nameSplit[nameSplit.length - 1];
+                int increment = 0;
+
+                try {
+                    increment = Integer.parseInt(incrementS);
+                    fileName = "";
+
+                    for(int i = 0; i < nameSplit.length - 1; i++ ){
+                        fileName += nameSplit[i] + "_";
+                    }
+                    fileName = fileName + increment;
+                }
+                catch(Exception ex){
+                    ex.printStackTrace();
+
+                    fileName = fileName +"_1";
+                }
+            }
+            outputPath = path + "/" + fileName + fileNameExt;
+
+            if((new File(outputPath)).exists()){
+                outputPath = fixSameNameFiles(path, fileName);
+            }
         }
         else{
-            outputPath = path;
+            outputPath = path + "/" + name;
         }
 
         return outputPath;

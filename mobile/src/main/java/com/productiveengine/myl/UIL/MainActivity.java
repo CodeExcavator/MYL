@@ -366,6 +366,14 @@ public class MainActivity extends AppCompatActivity {
                 View settingsView = inflater.inflate(R.layout.fragment_settings, container, false);
                 //txtTest.setText(settingsView.getContext(). .getRootFolder());
 
+                Button btnRefreshSongList = (Button) rootView.findViewById(R.id.btnRefreshSongList);
+                btnRefreshSongList.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onRefreshSongListClicked(v);
+                    }
+                });
+
                 Button btnPlay = (Button) rootView.findViewById(R.id.btnPlay);
                 btnPlay.setOnClickListener(new View.OnClickListener()
                 {
@@ -385,6 +393,16 @@ public class MainActivity extends AppCompatActivity {
                         onPauseClicked(v);
                     }
                 });
+
+                Button btnReplay = (Button) rootView.findViewById(R.id.btnReplay);
+                btnReplay.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        onReplayClicked(v);
+                    }
+                });
                 Button btnNext = (Button) rootView.findViewById(R.id.btnNext);
                 btnNext.setOnClickListener(new View.OnClickListener()
                 {
@@ -394,19 +412,14 @@ public class MainActivity extends AppCompatActivity {
                         onNextClicked(v);
                     }
                 });
-
-                Button btnRefreshSongList = (Button) rootView.findViewById(R.id.btnRefreshSongList);
-                btnRefreshSongList.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onRefreshSongListClicked(v);
-                    }
-                });
             }
 
             return rootView;
         }
         //Play -------------------------------------------------------------------------------
+        public void onRefreshSongListClicked(View v){
+            playVM.refreshSongList();
+        }
         public void onPlayClicked(View v){
             MainActivity ma = (MainActivity) this.getActivity();
             ma.informAudioService(MediaPlayerService.ACTION_PLAY);
@@ -415,12 +428,13 @@ public class MainActivity extends AppCompatActivity {
             MainActivity ma = (MainActivity) this.getActivity();
             ma.informAudioService(MediaPlayerService.ACTION_PAUSE);
         }
+        public void onReplayClicked(View v){
+            MainActivity ma = (MainActivity) this.getActivity();
+            ma.informAudioService(MediaPlayerService.ACTION_PREVIOUS);
+        }
         public void onNextClicked(View v){
             MainActivity ma = (MainActivity) this.getActivity();
             ma.informAudioService(MediaPlayerService.ACTION_NEXT);
-        }
-        public void onRefreshSongListClicked(View v){
-            playVM.refreshSongList();
         }
         //Settings -------------------------------------------------------------------------------
         public void onRootFolderClicked(View v){

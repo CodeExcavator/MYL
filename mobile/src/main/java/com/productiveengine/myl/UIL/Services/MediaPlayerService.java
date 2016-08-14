@@ -286,21 +286,43 @@ public class MediaPlayerService extends Service {
                          mMediaPlayer.stop();
                      }
                      mMediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(currentSongPath));
-                     mMediaPlayer.start();
+                     mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
+                         @Override
+                         public void onCompletion(MediaPlayer mplayer) {
+
+                             try {
+                                 onSkipToNext();
+                             } catch (Exception e) {
+
+                                 e.printStackTrace();
+                             }
+
+                         }
+                     });
+                     mMediaPlayer.start();
                  }
                  else{
                      sendResult("Song list is empty!");
                  }
-                 buildNotification( generateAction( android.R.drawable.ic_media_next, "Next", ACTION_NEXT ) );
+                 buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE  ) );
              }
 
              @Override
              public void onSkipToPrevious() {
                  super.onSkipToPrevious();
                  Log.e( "MediaPlayerService", "onSkipToPrevious");
-                 //Change media here
-                 buildNotification( generateAction( android.R.drawable.ic_media_previous, "Previous", ACTION_PAUSE ) );
+
+                 mMediaPlayer.stop();
+
+                 try {
+                     mMediaPlayer.prepare();
+                     mMediaPlayer.seekTo(0);
+                     onPlay();
+                 } catch (IOException e) {
+                     e.printStackTrace();
+                 }
+                 buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE ) );
              }
 
              @Override

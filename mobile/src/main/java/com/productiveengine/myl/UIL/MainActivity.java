@@ -1,12 +1,15 @@
 package com.productiveengine.myl.UIL;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.media.AudioManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
@@ -30,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.productiveengine.myl.BLL.AudioPlayBL;
+import com.productiveengine.myl.BLL.RefreshSongListTask;
 import com.productiveengine.myl.Common.HateCriteria;
 import com.productiveengine.myl.Common.LoveCriteria;
 import com.productiveengine.myl.Common.RequestCodes;
@@ -43,8 +47,9 @@ import java.io.File;
 
 import ar.com.daidalos.afiledialog.FileChooserActivity;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AudioManager.OnAudioFocusChangeListener{
 
+    private AudioManager mAudioManager;
     BroadcastReceiver receiver;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -191,6 +196,14 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+
+    }
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        mAudioManager.abandonAudioFocus(this);
     }
     @Override
     protected void onStart() {
@@ -224,6 +237,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onAudioFocusChange(int focusChange) {
+        if(focusChange<=0) {
+            informAudioService(MediaPlayerService.ACTION_PAUSE);
+        } else {
+            informAudioService(MediaPlayerService.ACTION_PLAY);
+        }
     }
 
     /**
@@ -418,7 +440,7 @@ public class MainActivity extends AppCompatActivity {
         }
         //Play -------------------------------------------------------------------------------
         public void onRefreshSongListClicked(View v){
-            playVM.refreshSongList();
+            AsyncTask task = new RefreshSongListTask(this.getActivity()).execute();
         }
         public void onPlayClicked(View v){
             MainActivity ma = (MainActivity) this.getActivity();

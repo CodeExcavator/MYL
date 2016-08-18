@@ -1,11 +1,5 @@
 package com.productiveengine.myl.UIL.Services;
 
-/**
- * Created by PaulTR
- * https://github.com/PaulTR/AndroidDemoProjects/blob/master/MediaSessionwithMediaStyleNotification/app/src/main/java/com/ptrprograms/mediasessionwithmediastylenotification/MediaPlayerService.java
- */
-
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -14,6 +8,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.Rating;
 import android.media.session.MediaController;
@@ -38,11 +33,9 @@ import com.productiveengine.myl.UIL.R;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by paulruiz on 10/28/14.
- */
 public class MediaPlayerService extends Service {
 
     private static final String TAG = MediaPlayerService.class.getName();
@@ -59,6 +52,7 @@ public class MediaPlayerService extends Service {
     private MediaSessionManager mManager;
     private MediaSession mSession;
     private MediaController mController;
+    private MediaMetadataRetriever mmr;
 
     private SettingsBL settingsBL;
     private SongBL songBL;
@@ -199,10 +193,15 @@ public class MediaPlayerService extends Service {
         Intent intent = new Intent( getApplicationContext(), MediaPlayerService.class );
         intent.setAction( ACTION_STOP );
         PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
+
+        File songFile = new File(currentSongPath);
+        String songTitle = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+        String songArtist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+
         Notification.Builder builder = new Notification.Builder( this )
                 .setSmallIcon(R.drawable.ic_launcher)
-                .setContentTitle( "Media Title" )
-                .setContentText( "Media Artist" )
+                .setContentTitle( songFile.getName() )
+                .setContentText( songArtist )
                 .setDeleteIntent( pendingIntent )
                 .setStyle(style);
 
@@ -286,6 +285,10 @@ public class MediaPlayerService extends Service {
                          mMediaPlayer.stop();
                      }
                      mMediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(currentSongPath));
+
+                     mmr = new MediaMetadataRetriever();
+                     mmr.setDataSource(getApplicationContext(), Uri.parse(currentSongPath));
+
                      mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
                          @Override

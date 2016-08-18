@@ -30,44 +30,14 @@ public class PlayVM extends BaseObservable implements Serializable {
     private SongBL songBL;
     private List<Song> songList;
     private Song currentSong;
-    private boolean traversable = true;
 
     public PlayVM(){
         songBL = new SongBL();
-    }
-
-    public void refreshSongList(){
-        settings = (new SettingsBL()).initializeSettingsFromDB();
-
-        if(traversable && settings.rootFolderPath != null && settings.rootFolderPath.trim().length() > 0){
-            songList = new ArrayList<Song>();
-            traverse(new File(settings.rootFolderPath));
-            songBL.saveAll(songList);
-        }
-    }
-
-    public void traverse (File dir) {
-        String filePath = "";
-
-        if (dir.exists()) {
-            File[] files = dir.listFiles();
-            for (int i = 0; i < files.length; ++i) {
-                File file = files[i];
-                filePath = file.getAbsolutePath();
-
-                if (file.isDirectory()) {
-                    traverse(file);
-                } else if(filePath.endsWith(".mp3") || filePath.endsWith(".3gp") || filePath.endsWith(".flac") || filePath.endsWith(".ogg") || filePath.endsWith(".wav") ) {
-                    songList.add(new Song(file.getName(),filePath));
-                }
-            }
-        }
     }
     //--------------------------------------
     public Settings getSettings() {
         return settings;
     }
-
     public void setSettings(Settings settings) {
         this.settings = settings;
     }

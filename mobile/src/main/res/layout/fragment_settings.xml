@@ -13,70 +13,96 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="top">
+            android:layout_gravity="top"
+            android:layout_marginLeft="5dp">
 
-            <TextView
-                android:layout_width="159dp"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Root folder"
-                android:id="@+id/lblRootFolder" />
-            <Button
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="..."
-                android:id="@+id/btnRootFolder"
-                />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Root folder"
+                    android:id="@+id/lblRootFolder" />
+
+                <RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+                    <Button
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="..."
+                        android:id="@+id/btnRootFolder"
+                        android:background="@drawable/blue_button"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="5dp"/>
+                </RelativeLayout>
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="@={settingsVM.rootFolderPath}"
-                android:id="@+id/lblRootFolderPath" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Target folder"
-                android:id="@+id/lblTargetFolder"
-                />
-            <Button
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="..."
-                android:id="@+id/btnTargetFolder"
-                />
+                android:id="@+id/lblRootFolderPath"
+                android:textColor="@color/green"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Target folder"
+                    android:id="@+id/lblTargetFolder"/>
+                <RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+                    <Button
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="..."
+                        android:id="@+id/btnTargetFolder"
+                        android:background="@drawable/blue_button"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="5dp" />
+                </RelativeLayout>
+            </LinearLayout>
             <!-- android:onClick="@{settingsVM::onClickFriend}" -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="@={settingsVM.targetFolderPath}"
-                android:id="@+id/lblTargetFolderPath" />
+                android:id="@+id/lblTargetFolderPath"
+                android:textColor="@color/green"/>
 
             <View android:id="@+id/hateDivisor"
                 android:layout_height="2dp"
                 android:layout_width="fill_parent"
                 android:background="#ffffff" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Hate criteria"
                 />
             <RadioGroup
                 android:id="@+id/radioGroupHate"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <!--   -->
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp">
                 <RadioButton
                     android:id="@+id/btnHateTimeLimit"
                     android:layout_width="wrap_content"
@@ -91,8 +117,11 @@
                     android:text="@={`` + settingsVM.hateTimeLimit}"
                     android:ems="10"
                     android:id="@+id/txtHateTimeLimit"
-                    android:enabled="@{settingsVM.hateTimeLimitChk}"/>
-                <!--   -->
+                    android:enabled="@{settingsVM.hateTimeLimitChk}"
+                    android:gravity="right"
+                    android:textAlignment="gravity"
+                    android:layout_marginRight="10dp"/>
+
                 <RadioButton
                     android:id="@+id/btnHatePercentage"
                     android:layout_width="wrap_content"
@@ -107,10 +136,11 @@
                     android:text="@={`` + settingsVM.hateTimePercentage}"
                     android:ems="10"
                     android:id="@+id/txtHateTimePercentage"
-                    android:enabled="@{!settingsVM.hateTimeLimitChk}"/>
+                    android:enabled="@{!settingsVM.hateTimeLimitChk}"
+                    android:gravity="right"
+                    android:textAlignment="gravity"
+                    android:layout_marginRight="10dp"/>
             </RadioGroup>
-            <!--                                                         -->
-            <!--                                                         -->
             <View android:id="@+id/loveDivisor"
                 android:layout_height="2dp"
                 android:layout_width="fill_parent"
@@ -118,13 +148,15 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Love criteria"
                 />
             <RadioGroup
                 android:id="@+id/radioGroupLove"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                >
                 <RadioButton
                     android:id="@+id/btnLoveTimeLimit"
                     android:layout_width="wrap_content"
@@ -139,8 +171,10 @@
                     android:text="@={`` + settingsVM.loveTimeLimit}"
                     android:ems="10"
                     android:id="@+id/txtLoveTimeLimit"
-                    android:enabled="@{settingsVM.loveTimeLimitChk}"/>
-                <!--   -->
+                    android:enabled="@{settingsVM.loveTimeLimitChk}"
+                    android:gravity="right"
+                    android:textAlignment="gravity"
+                    android:layout_marginRight="10dp"/>
                 <RadioButton
                     android:id="@+id/btnLovePercentage"
                     android:layout_width="wrap_content"
@@ -153,9 +187,12 @@
                     android:layout_height="wrap_content"
                     android:inputType="number"
                     android:text="@={`` + settingsVM.loveTimePercentage}"
-                    android:ems="10"
                     android:id="@+id/txtLoveTimePercentage"
-                    android:enabled="@{!settingsVM.loveTimeLimitChk}"/>
+                    android:enabled="@{!settingsVM.loveTimeLimitChk}"
+                    android:gravity="right"
+                    android:textAlignment="gravity"
+                    android:layout_marginRight="10dp"
+                    />
             </RadioGroup>
         </LinearLayout>
     </ScrollView>

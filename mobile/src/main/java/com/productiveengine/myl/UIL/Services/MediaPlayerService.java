@@ -64,6 +64,7 @@ public class MediaPlayerService extends Service {
 
     public void sendResult(String message) {
         Intent intent = new Intent(MEDIA_PLAYER_RESULT);
+
         if(message != null)
             intent.putExtra(MEDIA_PLAYER_MSG, message);
         broadcaster.sendBroadcast(intent);
@@ -255,6 +256,10 @@ public class MediaPlayerService extends Service {
                  super.onPlay();
                  Log.e( "MediaPlayerService", "onPlay");
 
+                 if(currentSongPath == null){
+                     onSkipToNext();
+                     return;
+                 }
                  if(mMediaPlayer != null && !mMediaPlayer.isPlaying()){
                      mMediaPlayer.start();
                  }
@@ -274,7 +279,9 @@ public class MediaPlayerService extends Service {
                  super.onSkipToNext();
                  Log.e( "MediaPlayerService", "onSkipToNext");
 
-                 applyCriteria(mMediaPlayer, currentSongPath);
+                 if(currentSongPath != null){
+                     applyCriteria(mMediaPlayer, currentSongPath);
+                 }
                  Song song = songBL.fetchNextSong();
 
                  if(song != null && song.name != null && song.name.trim().length() > 0){

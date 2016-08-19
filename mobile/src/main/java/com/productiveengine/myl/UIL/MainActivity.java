@@ -175,6 +175,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -183,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                         .setAction("Action", null).show();
             }
         });
-
+        fab.setVisibility(View.GONE);
         //Bind with background service -----------------------------------------------
         //doBindService();
         receiver = new BroadcastReceiver() {
@@ -386,7 +387,6 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                 rootView = fragmentPlayBinding.getRoot();
 
                 View settingsView = inflater.inflate(R.layout.fragment_settings, container, false);
-                //txtTest.setText(settingsView.getContext(). .getRootFolder());
 
                 Button btnRefreshSongList = (Button) rootView.findViewById(R.id.btnRefreshSongList);
                 btnRefreshSongList.setOnClickListener(new View.OnClickListener() {
@@ -498,6 +498,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                     }
                 break;
             }
+
         }
         public void onHateCriteriaChanged(View v) {
 

@@ -1,19 +1,20 @@
 package com.productiveengine.myl.UIL;
 
+import android.animation.ObjectAnimator;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -24,19 +25,24 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.productiveengine.myl.BLL.AudioPlayBL;
+import com.productiveengine.myl.BLL.CriteriaBL;
 import com.productiveengine.myl.BLL.RefreshSongListTask;
 import com.productiveengine.myl.Common.HateCriteria;
 import com.productiveengine.myl.Common.LoveCriteria;
 import com.productiveengine.myl.Common.RequestCodes;
+import com.productiveengine.myl.Common.Util;
 import com.productiveengine.myl.UIL.Services.MediaPlayerService;
 import com.productiveengine.myl.UIL.databinding.FragmentPlayBinding;
 import com.productiveengine.myl.UIL.databinding.FragmentSettingsBinding;
@@ -50,7 +56,8 @@ import ar.com.daidalos.afiledialog.FileChooserActivity;
 public class MainActivity extends AppCompatActivity implements AudioManager.OnAudioFocusChangeListener{
 
     private AudioManager mAudioManager;
-    BroadcastReceiver receiver;
+    BroadcastReceiver msgReceiver;
+    BroadcastReceiver infoReceiver;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -98,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         b.putString("songPath",nextSongPath);
         intent.putExtras(b);
 
-        audioPlayService.applyCriteria();
+        audioPlayService.applyCriteriaDB();
         audioPlayService.onDestroy();
         audioPlayService.startService(intent);
         */
@@ -175,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-
+/*
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -185,21 +192,79 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
             }
         });
         fab.setVisibility(View.GONE);
+        */
         //Bind with background service -----------------------------------------------
         //doBindService();
-        receiver = new BroadcastReceiver() {
+        msgReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String s = intent.getStringExtra(MediaPlayerService.MEDIA_PLAYER_MSG);
 
                 TextView txtCurrentSong = (TextView) findViewById(R.id.txtCurrentSong);
                 txtCurrentSong.setText(s);
+                TextView txtSongSate = (TextView) findViewById(R.id.txtSongState);
+                txtSongSate.setText("");
             }
         };
 
+        infoReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String songName = intent.getStringExtra(MediaPlayerService.MP_NAME);
+                String durationS = intent.getStringExtra(MediaPlayerService.MP_DURATION);
+                String currentPositionS = intent.getStringExtra(MediaPlayerService.MP_CURRENT_POSITION);
+
+                TextView txtCurrentSong = (TextView) findViewById(R.id.txtCurrentSong);
+                txtCurrentSong.setText(songName);
+
+                int durationMS = 0;
+                int currentPositionMS = 0;
+                int duration = 0;
+                int currentPosition = 0;
+                double percentage = 0;
+
+                try{
+                    durationMS = Integer.parseInt(durationS);
+                    currentPositionMS = Integer.parseInt(currentPositionS);
+
+                    duration = Util.convertTrackTimeToSeconds(durationMS);
+                    currentPosition = Util.convertTrackTimeToSeconds(currentPositionMS);
+
+                    percentage = (((double) currentPosition) / duration) * 100;
+                }catch(Exception ex){
+                    ex.printStackTrace();
+                }
+
+                TextView txtSongSate = (TextView) findViewById(R.id.txtSongState);
+                txtSongSate.setText(Util.milliSecondsToTimer(currentPositionMS) + "/" +
+                        Util.milliSecondsToTimer(durationMS) +" " +
+                        String.format("%.2f", percentage) + "%");
+
+                SeekBar musicSeekBar = (SeekBar) findViewById(R.id.musicSeekBar);
+
+                if(musicSeekBar != null){
+                    musicSeekBar.setProgress((int) percentage);
+
+                    if(android.os.Build.VERSION.SDK_INT >= 11){
+                        // will update the "progress" propriety of seekbar until it reaches progress
+                        ObjectAnimator animation = ObjectAnimator.ofInt(musicSeekBar, "progress", (int) percentage);
+                        animation.setDuration(500); // 0.5 second
+                        animation.setInterpolator(new DecelerateInterpolator());
+                        animation.start();
+                    }
+                    else
+                        musicSeekBar.setProgress((int) percentage); // no animation on Gingerbread or lower
+                }
+
+                //musicSeekBar.setBackgroundColor(CriteriaBL.applyCriteriaInMemory_SeekbarColor(currentPosition, percentage));
+                int seekbarColor = CriteriaBL.applyCriteriaInMemory_SeekbarColor(currentPosition, percentage);
+
+                musicSeekBar.getProgressDrawable().setColorFilter(seekbarColor, PorterDuff.Mode.SRC_IN);
+                musicSeekBar.getThumb().setColorFilter(seekbarColor, PorterDuff.Mode.SRC_IN);
+            }
+        };
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-
     }
     @Override
     public void onDestroy(){
@@ -209,14 +274,18 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
     @Override
     protected void onStart() {
         super.onStart();
-        LocalBroadcastManager.getInstance(this).registerReceiver((receiver),
+        LocalBroadcastManager.getInstance(this).registerReceiver((msgReceiver),
                 new IntentFilter(MediaPlayerService.MEDIA_PLAYER_RESULT)
+        );
+        LocalBroadcastManager.getInstance(this).registerReceiver((infoReceiver),
+                new IntentFilter(MediaPlayerService.MEDIA_PLAYER_INFO)
         );
     }
 
     @Override
     protected void onStop() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(msgReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(infoReceiver);
         super.onStop();
     }
     @Override
@@ -284,6 +353,9 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         EditText txtLoveTimePercentage;
         EditText txtHateTimeLimit;
         EditText txtHateTimePercentage;
+
+        SeekBar musicSeekBar;
+        private final Handler handler = new Handler();
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -434,10 +506,19 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                         onNextClicked(v);
                     }
                 });
-            }
 
+                musicSeekBar = (SeekBar) rootView.findViewById(R.id.musicSeekBar);
+
+                musicSeekBar.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View view, MotionEvent motionEvent) {
+                        return true;
+                    }
+                });
+            }
             return rootView;
         }
+
         //Play -------------------------------------------------------------------------------
         public void onRefreshSongListClicked(View v){
             AsyncTask task = new RefreshSongListTask(this.getActivity()).execute();

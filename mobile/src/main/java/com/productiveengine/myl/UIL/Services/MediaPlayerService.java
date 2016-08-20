@@ -4,10 +4,8 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.Rating;
@@ -21,20 +19,16 @@ import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.productiveengine.myl.BLL.CriteriaBL;
 import com.productiveengine.myl.BLL.SettingsBL;
 import com.productiveengine.myl.BLL.SongBL;
-import com.productiveengine.myl.Common.FileActions;
-import com.productiveengine.myl.Common.HateCriteria;
-import com.productiveengine.myl.Common.LoveCriteria;
-import com.productiveengine.myl.DomainClasses.Settings;
 import com.productiveengine.myl.DomainClasses.Song;
-import com.productiveengine.myl.UIL.BroadcastReceivers.RemoteControlReceiver;
 import com.productiveengine.myl.UIL.R;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.util.concurrent.TimeUnit;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MediaPlayerService extends Service {
 
@@ -57,10 +51,18 @@ public class MediaPlayerService extends Service {
     private SettingsBL settingsBL;
     private SongBL songBL;
     private String currentSongPath;
+    private String currentSongName;
 
     LocalBroadcastManager broadcaster;
-    static final public String MEDIA_PLAYER_RESULT = "com.productiveengine.myl.UIL.Services.MediaPlayerService.REQUEST_PROCESSED";
+    static final public String MEDIA_PLAYER_RESULT = "com.productiveengine.myl.UIL.Services.MediaPlayerService.MEDIA_PLAYER_RESULT";
     static final public String MEDIA_PLAYER_MSG = "com.productiveengine.myl.UIL.Services.MediaPlayerService.MEDIA_PLAYER_MSG";
+
+    static final public String MEDIA_PLAYER_INFO = "com.productiveengine.myl.UIL.Services.MediaPlayerService.MEDIA_PLAYER_INFO";
+    static final public String MP_NAME = "com.productiveengine.myl.UIL.Services.MediaPlayerService.MP_NAME";
+    static final public String MP_DURATION = "com.productiveengine.myl.UIL.Services.MediaPlayerService.MP_DURATION";
+    static final public String MP_CURRENT_POSITION = "com.productiveengine.myl.UIL.Services.MediaPlayerService.MP_CURRENT_POSITION";
+
+    final Timer timer = new Timer();
 
     public void sendResult(String message) {
         Intent intent = new Intent(MEDIA_PLAYER_RESULT);
@@ -68,6 +70,33 @@ public class MediaPlayerService extends Service {
         if(message != null)
             intent.putExtra(MEDIA_PLAYER_MSG, message);
         broadcaster.sendBroadcast(intent);
+    }
+
+    public void updateUI() {
+        Intent intent = new Intent(MEDIA_PLAYER_INFO);
+
+        intent.putExtra(MP_NAME, currentSongName );
+        intent.putExtra(MP_DURATION, mMediaPlayer.getDuration() + "");
+        intent.putExtra(MP_CURRENT_POSITION, mMediaPlayer.getCurrentPosition() + "");
+
+        broadcaster.sendBroadcast(intent);
+    }
+
+    public void timerFunction(){
+
+        timer.purge();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+                    updateUI();
+                } else {
+                    timer.cancel();
+                    timer.purge();
+                }
+            }
+        }, 0, 1000);
     }
 
     @Override
@@ -79,77 +108,6 @@ public class MediaPlayerService extends Service {
 
         //AudioManager manager = (AudioManager) getSystemService(AUDIO_SERVICE);
         //manager.registerMediaButtonEventReceiver(RemoteControlReceiver);
-    }
-
-    private boolean applyCriteria(MediaPlayer player, String currentSongPath){
-
-        boolean ok = false;
-        boolean songDeleted = false;
-
-        if(player == null || currentSongPath == null){
-            return ok;
-        }
-
-        FileActions fileActions = new FileActions();
-
-        try {
-            //Get track info
-            int duration = convertTrackTimeToSeconds(player.getDuration());
-            int currentPosition = convertTrackTimeToSeconds(player.getCurrentPosition());
-
-            File songFile = new File(currentSongPath);
-            //Delete from DB
-            songBL.deleteByPath(currentSongPath);
-            //Get settings from DB
-            Settings settings = settingsBL.initializeSettingsFromDB();
-            //Apply hate
-            switch (HateCriteria.fromInt(settings.hateCriteria)) {
-                case TIME_LIMIT:
-                    if (settings.hateTimeLimit > currentPosition) {
-                        fileActions.deleteFile(songFile.getParent(), songFile.getName());
-                        songDeleted = true;
-                    }
-                    break;
-                case PERCENTAGE:
-                    double completionPercentage = (((double) currentPosition) / duration) * 100;
-
-                    if (settings.hateTimePercentage > completionPercentage) {
-                        fileActions.deleteFile(songFile.getParent(), songFile.getName());
-                        songDeleted = true;
-                    }
-                    break;
-            }
-            //Apply love
-            if(!songDeleted) {
-                switch (LoveCriteria.fromInt(settings.loveCriteria)) {
-                    case TIME_LIMIT:
-                        if (settings.loveTimeLimit < currentPosition) {
-                            fileActions.moveFile(songFile.getParent(), songFile.getName(), settings.targetFolderPath);
-                        }
-                        break;
-                    case PERCENTAGE:
-                        double completionPercentage = (((double) currentPosition) / duration) * 100;
-
-                        if (settings.loveTimePercentage < currentPosition) {
-                            fileActions.moveFile(songFile.getParent(), songFile.getName(), settings.targetFolderPath);
-                        }
-                        break;
-                }
-            }
-            ok = true;
-        }
-        catch (Exception ex){
-            Log.e(TAG,ex.getMessage());
-        }
-        return ok;
-    }
-
-    private int convertTrackTimeToSeconds(int duration){
-        return (int) TimeUnit.MILLISECONDS.toMinutes(duration) * 60 +
-                (int)(
-                        TimeUnit.MILLISECONDS.toSeconds(duration) -
-                                (int)TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
-                );
     }
 
     @Override
@@ -261,7 +219,7 @@ public class MediaPlayerService extends Service {
                      return;
                  }
                  if(mMediaPlayer != null && !mMediaPlayer.isPlaying()){
-                     mMediaPlayer.start();
+                     startPlayback();
                  }
                  buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE ) );
              }
@@ -270,7 +228,10 @@ public class MediaPlayerService extends Service {
              public void onPause() {
                  super.onPause();
                  Log.e( "MediaPlayerService", "onPause");
-                 mMediaPlayer.pause();
+
+                 if(mMediaPlayer != null) {
+                     mMediaPlayer.pause();
+                 }
                  buildNotification(generateAction(android.R.drawable.ic_media_play, "Play", ACTION_PLAY));
              }
 
@@ -280,13 +241,13 @@ public class MediaPlayerService extends Service {
                  Log.e( "MediaPlayerService", "onSkipToNext");
 
                  if(currentSongPath != null){
-                     applyCriteria(mMediaPlayer, currentSongPath);
+                     CriteriaBL.applyCriteriaDB(mMediaPlayer, currentSongPath);
                  }
                  Song song = songBL.fetchNextSong();
 
                  if(song != null && song.name != null && song.name.trim().length() > 0){
                      currentSongPath = song.path;
-                     sendResult(song.name);
+                     currentSongName = song.name;
 
                      if(mMediaPlayer != null && mMediaPlayer.isPlaying()){
                          mMediaPlayer.stop();
@@ -300,17 +261,16 @@ public class MediaPlayerService extends Service {
 
                          @Override
                          public void onCompletion(MediaPlayer mplayer) {
-
                              try {
                                  onSkipToNext();
                              } catch (Exception e) {
 
                                  e.printStackTrace();
                              }
-
                          }
                      });
-                     mMediaPlayer.start();
+
+                     startPlayback();
                  }
                  else{
                      sendResult("Song list is empty!");
@@ -378,6 +338,14 @@ public class MediaPlayerService extends Service {
     public boolean onUnbind(Intent intent) {
         mSession.release();
         return super.onUnbind(intent);
+    }
+
+    private void startPlayback(){
+        CriteriaBL.loadInMemoryCriteria();
+
+        //mMediaPlayer.prepare();
+        mMediaPlayer.start();
+        timerFunction();
     }
 
     public String getCurrentSongPath() {

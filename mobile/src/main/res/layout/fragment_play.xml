@@ -16,6 +16,15 @@
             android:layout_height="match_parent"
             android:weightSum="1">
 
+            <SeekBar
+                android:id="@+id/musicSeekBar"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:enabled="false"
+                android:background="@color/lightGrey">
+            </SeekBar>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -30,10 +39,16 @@
                 android:gravity="center"
                 />
 
+            <View android:id="@+id/hateDivisor"
+                android:layout_height="2dp"
+                android:layout_width="fill_parent"
+                android:background="#ffffff" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
+
                 <Button
                     android:text="Pause"
                     android:layout_width="match_parent"

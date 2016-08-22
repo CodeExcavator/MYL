@@ -89,7 +89,7 @@ public class MediaPlayerService extends Service {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+                if (mMediaPlayer != null) {
                     updateUI();
                 } else {
                     timer.cancel();
@@ -153,6 +153,9 @@ public class MediaPlayerService extends Service {
         intent.setAction( ACTION_STOP );
         PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
 
+        if(currentSongPath == null){
+            return;
+        }
         File songFile = new File(currentSongPath);
         String songTitle = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
         String songArtist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
@@ -317,6 +320,7 @@ public class MediaPlayerService extends Service {
 
                  NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
                  notificationManager.cancel( 1 );
+                 timer.cancel();
                  Intent intent = new Intent( getApplicationContext(), MediaPlayerService.class );
                  stopService( intent );
              }
@@ -337,13 +341,13 @@ public class MediaPlayerService extends Service {
     @Override
     public boolean onUnbind(Intent intent) {
         mSession.release();
+        timer.cancel();
         return super.onUnbind(intent);
     }
 
     private void startPlayback(){
         CriteriaBL.loadInMemoryCriteria();
 
-        //mMediaPlayer.prepare();
         mMediaPlayer.start();
         timerFunction();
     }

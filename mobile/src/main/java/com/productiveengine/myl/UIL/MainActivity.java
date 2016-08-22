@@ -3,23 +3,21 @@ package com.productiveengine.myl.UIL;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -31,12 +29,12 @@ import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.productiveengine.myl.BLL.AudioPlayBL;
 import com.productiveengine.myl.BLL.CriteriaBL;
 import com.productiveengine.myl.BLL.RefreshSongListTask;
 import com.productiveengine.myl.Common.HateCriteria;
@@ -80,36 +78,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
     public static boolean initialPlay = true;
     private boolean playOrPause = true;
 
-    //Backgroud Service instance
-    public AudioPlayBL audioPlayService;
-
-    //Service Binding
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        public void onServiceConnected(ComponentName className, IBinder binder) {
-            audioPlayService = ((AudioPlayBL.MyBinder) binder).getService();
-
-        }
-        public void onServiceDisconnected(ComponentName className) {
-            audioPlayService = null;
-        }
-    };
-    void doBindService() {
-        bindService(new Intent(this, AudioPlayBL.class), mConnection,
-                Context.BIND_AUTO_CREATE);
-    }
     public void informAudioService(String action){
-        /*
-        Intent intent = new Intent(this, AudioPlayBL.class);
-        Bundle b = new Bundle();
-        b.putString("songPath",nextSongPath);
-        intent.putExtras(b);
-
-        audioPlayService.applyCriteriaDB();
-        audioPlayService.onDestroy();
-        audioPlayService.startService(intent);
-        */
-
         Intent intent = new Intent( getApplicationContext(), MediaPlayerService.class );
         intent.setAction( action );
         startService( intent );
@@ -121,6 +90,39 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         this.startActivityForResult(intent, RequestCodes.CHOOSE_TARGET_FOLDER);
     }
     //----------------------------------------------------------
+    @Override
+    public void onBackPressed()
+    {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+        alertDialog.setTitle("PASSWORD");
+        alertDialog.setMessage("Enter Password");
+
+        final EditText input = new EditText(MainActivity.this);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+        alertDialog.setView(input);
+        alertDialog.show();
+/*
+        new AlertDialog.Builder(this)
+            .setTitle("Quit Music You Love")
+            .setMessage("Are you sure you want to exit M.Y.L. ?")
+            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+
+                    informAudioService(MediaPlayerService.ACTION_STOP);
+                    finish();
+
+                } })
+            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+
+                } })
+            .setIcon(android.R.drawable.ic_dialog_info)
+            .show();
+*/
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -201,9 +203,11 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                 String s = intent.getStringExtra(MediaPlayerService.MEDIA_PLAYER_MSG);
 
                 TextView txtCurrentSong = (TextView) findViewById(R.id.txtCurrentSong);
-                txtCurrentSong.setText(s);
+                txtCurrentSong.setText("");
                 TextView txtSongSate = (TextView) findViewById(R.id.txtSongState);
                 txtSongSate.setText("");
+
+                openDialog(s);
             }
         };
 
@@ -266,6 +270,16 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
     }
+
+    private void openDialog(String msg){
+
+        new AlertDialog.Builder(this)
+                .setTitle("Info")
+                .setMessage(msg)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .show();
+    }
+
     @Override
     public void onDestroy(){
         super.onDestroy();
@@ -521,7 +535,10 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
 
         //Play -------------------------------------------------------------------------------
         public void onRefreshSongListClicked(View v){
-            AsyncTask task = new RefreshSongListTask(this.getActivity()).execute();
+            MainActivity ma = (MainActivity) this.getActivity();
+            ma.informAudioService(MediaPlayerService.ACTION_STOP);
+
+            AsyncTask task = new RefreshSongListTask(ma).execute();
         }
         public void onPlayClicked(View v){
             MainActivity ma = (MainActivity) this.getActivity();

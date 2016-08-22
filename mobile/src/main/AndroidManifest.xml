@@ -37,7 +37,7 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/MyAppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -45,7 +45,6 @@
             </intent-filter>
         </activity>
 
-        <service android:enabled="false" android:name="com.productiveengine.myl.BLL.AudioPlayBL"></service>
         <service android:enabled="true" android:name="com.productiveengine.myl.UIL.Services.MediaPlayerService"></service>
     </application>
 

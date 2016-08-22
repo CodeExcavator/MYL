@@ -31,6 +31,8 @@ public class RefreshSongListTask extends AsyncTask<Void, Void, Void> {
     protected void onPreExecute() {
         super.onPreExecute();
         this.dialog.setMessage("Progress start");
+        this.dialog.setCancelable(false);
+        //this.dialog.setCanceledOnTouchOutside(false);
         this.dialog.show();
     }
     @Override

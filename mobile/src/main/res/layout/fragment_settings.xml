@@ -12,8 +12,7 @@
     tools:context="com.productiveengine.myl.UIL.Settings">
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:orientation="vertical"
@@ -102,15 +101,14 @@
             <RadioGroup
                 android:id="@+id/radioGroupHate"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp">
+                android:layout_height="wrap_content">
                 <RadioButton
                     android:id="@+id/btnHateTimeLimit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text= "@string/loveTimeLimit"
-                    android:checked="@={settingsVM.hateTimeLimitChk}"
-                    />
+                    android:checked="@={settingsVM.hateTimeLimitChk}" />
+
                 <EditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -155,9 +153,7 @@
             <RadioGroup
                 android:id="@+id/radioGroupLove"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                >
+                android:layout_height="wrap_content">
                 <RadioButton
                     android:id="@+id/btnLoveTimeLimit"
                     android:layout_width="wrap_content"

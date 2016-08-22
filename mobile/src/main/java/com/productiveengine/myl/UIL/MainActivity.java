@@ -93,18 +93,6 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
     @Override
     public void onBackPressed()
     {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
-        alertDialog.setTitle("PASSWORD");
-        alertDialog.setMessage("Enter Password");
-
-        final EditText input = new EditText(MainActivity.this);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        input.setLayoutParams(lp);
-        alertDialog.setView(input);
-        alertDialog.show();
-/*
         new AlertDialog.Builder(this)
             .setTitle("Quit Music You Love")
             .setMessage("Are you sure you want to exit M.Y.L. ?")
@@ -121,7 +109,6 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                 } })
             .setIcon(android.R.drawable.ic_dialog_info)
             .show();
-*/
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -183,6 +170,8 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+
+        getSupportActionBar().hide();
 
 /*
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

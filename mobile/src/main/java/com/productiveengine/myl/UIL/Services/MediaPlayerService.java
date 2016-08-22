@@ -286,14 +286,16 @@ public class MediaPlayerService extends Service {
                  super.onSkipToPrevious();
                  Log.e( "MediaPlayerService", "onSkipToPrevious");
 
-                 mMediaPlayer.stop();
+                 if(mMediaPlayer != null) {
+                     mMediaPlayer.stop();
 
-                 try {
-                     mMediaPlayer.prepare();
-                     mMediaPlayer.seekTo(0);
-                     onPlay();
-                 } catch (IOException e) {
-                     e.printStackTrace();
+                     try {
+                         mMediaPlayer.prepare();
+                         mMediaPlayer.seekTo(0);
+                         onPlay();
+                     } catch (IOException e) {
+                         e.printStackTrace();
+                     }
                  }
                  buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE ) );
              }
@@ -316,8 +318,10 @@ public class MediaPlayerService extends Service {
              public void onStop() {
                  super.onStop();
                  Log.e( "MediaPlayerService", "onStop");
-                 mMediaPlayer.stop();
 
+                 if(mMediaPlayer != null) {
+                     mMediaPlayer.stop();
+                 }
                  NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
                  notificationManager.cancel( 1 );
                  timer.cancel();

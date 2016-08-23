@@ -8,10 +8,6 @@ import com.productiveengine.myl.DomainClasses.Song;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * Created by Nikolaos on 11/08/2016.
- */
-
 public class SongBL implements Serializable{
 
     public Song fetchNextSong(){

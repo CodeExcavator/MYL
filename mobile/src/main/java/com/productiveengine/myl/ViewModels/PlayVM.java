@@ -9,19 +9,11 @@ import com.productiveengine.myl.DomainClasses.Song;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * Created by Nikolaos on 23/07/2016.
- */
-
 public class PlayVM extends BaseObservable implements Serializable {
 
     private Settings settings;
-    private SongBL songBL;
-    private List<Song> songList;
-    private Song currentSong;
 
     public PlayVM(){
-        songBL = new SongBL();
     }
     //--------------------------------------
     public Settings getSettings() {

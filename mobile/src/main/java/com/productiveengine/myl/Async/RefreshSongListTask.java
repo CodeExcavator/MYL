@@ -1,10 +1,12 @@
-package com.productiveengine.myl.BLL;
+package com.productiveengine.myl.Async;
 
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 
+import com.productiveengine.myl.BLL.SettingsBL;
+import com.productiveengine.myl.BLL.SongBL;
 import com.productiveengine.myl.DomainClasses.Settings;
 import com.productiveengine.myl.DomainClasses.Song;
 
@@ -20,7 +22,6 @@ public class RefreshSongListTask extends AsyncTask<Void, Void, Void> {
     private Settings settings;
     private SongBL songBL;
     private List<Song> songList;
-    private Song currentSong;
 
     public RefreshSongListTask(FragmentActivity activity){
         this.activity = activity;
@@ -32,7 +33,6 @@ public class RefreshSongListTask extends AsyncTask<Void, Void, Void> {
         super.onPreExecute();
         this.dialog.setMessage("Progress start");
         this.dialog.setCancelable(false);
-        //this.dialog.setCanceledOnTouchOutside(false);
         this.dialog.show();
     }
     @Override

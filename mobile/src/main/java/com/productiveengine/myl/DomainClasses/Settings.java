@@ -3,14 +3,6 @@ package com.productiveengine.myl.DomainClasses;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
-import com.activeandroid.query.Select;
-import com.productiveengine.myl.Common.LoveCriteria;
-
-import java.util.List;
-
-/**
- * Created by nifra on 29/07/2016.
- */
 
 @Table(name = "Settings")
 public class Settings extends Model{

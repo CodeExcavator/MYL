@@ -1,4 +1,4 @@
-package com.productiveengine.myl.UIL.Services;
+package com.productiveengine.myl.Services;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -37,13 +37,12 @@ public class MediaPlayerService extends Service {
     public static final String ACTION_PLAY = "action_play";
     public static final String ACTION_PAUSE = "action_pause";
     public static final String ACTION_REWIND = "action_rewind";
-    public static final String ACTION_FAST_FORWARD = "action_fast_foward";
+    public static final String ACTION_FAST_FORWARD = "action_fast_forward";
     public static final String ACTION_NEXT = "action_next";
     public static final String ACTION_PREVIOUS = "action_previous";
     public static final String ACTION_STOP = "action_stop";
 
     private MediaPlayer mMediaPlayer;
-    private MediaSessionManager mManager;
     private MediaSession mSession;
     private MediaController mController;
     private MediaMetadataRetriever mmr;
@@ -54,60 +53,20 @@ public class MediaPlayerService extends Service {
     private String currentSongName;
 
     LocalBroadcastManager broadcaster;
-    static final public String MEDIA_PLAYER_RESULT = "com.productiveengine.myl.UIL.Services.MediaPlayerService.MEDIA_PLAYER_RESULT";
-    static final public String MEDIA_PLAYER_MSG = "com.productiveengine.myl.UIL.Services.MediaPlayerService.MEDIA_PLAYER_MSG";
-
-    static final public String MEDIA_PLAYER_INFO = "com.productiveengine.myl.UIL.Services.MediaPlayerService.MEDIA_PLAYER_INFO";
-    static final public String MP_NAME = "com.productiveengine.myl.UIL.Services.MediaPlayerService.MP_NAME";
-    static final public String MP_DURATION = "com.productiveengine.myl.UIL.Services.MediaPlayerService.MP_DURATION";
-    static final public String MP_CURRENT_POSITION = "com.productiveengine.myl.UIL.Services.MediaPlayerService.MP_CURRENT_POSITION";
+    static final public String MEDIA_PLAYER_RESULT = "com.productiveengine.myl.Services.MediaPlayerService.MEDIA_PLAYER_RESULT";
+    static final public String MEDIA_PLAYER_MSG = "com.productiveengine.myl.Services.MediaPlayerService.MEDIA_PLAYER_MSG";
+    static final public String MEDIA_PLAYER_INFO = "com.productiveengine.myl.Services.MediaPlayerService.MEDIA_PLAYER_INFO";
+    static final public String MP_NAME = "com.productiveengine.myl.Services.MediaPlayerService.MP_NAME";
+    static final public String MP_DURATION = "com.productiveengine.myl.Services.MediaPlayerService.MP_DURATION";
+    static final public String MP_CURRENT_POSITION = "com.productiveengine.myl.Services.MediaPlayerService.MP_CURRENT_POSITION";
 
     final Timer timer = new Timer();
 
-    public void sendResult(String message) {
-        Intent intent = new Intent(MEDIA_PLAYER_RESULT);
-
-        if(message != null)
-            intent.putExtra(MEDIA_PLAYER_MSG, message);
-        broadcaster.sendBroadcast(intent);
-    }
-
-    public void updateUI() {
-        Intent intent = new Intent(MEDIA_PLAYER_INFO);
-
-        intent.putExtra(MP_NAME, currentSongName );
-        intent.putExtra(MP_DURATION, mMediaPlayer.getDuration() + "");
-        intent.putExtra(MP_CURRENT_POSITION, mMediaPlayer.getCurrentPosition() + "");
-
-        broadcaster.sendBroadcast(intent);
-    }
-
-    public void timerFunction(){
-
-        timer.purge();
-
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if (mMediaPlayer != null) {
-                    updateUI();
-                } else {
-                    timer.cancel();
-                    timer.purge();
-                }
-            }
-        }, 0, 1000);
-    }
-
     @Override
     public void onCreate() {
-
         broadcaster = LocalBroadcastManager.getInstance(this);
         settingsBL = new SettingsBL();
         songBL = new SongBL();
-
-        //AudioManager manager = (AudioManager) getSystemService(AUDIO_SERVICE);
-        //manager.registerMediaButtonEventReceiver(RemoteControlReceiver);
     }
 
     @Override
@@ -180,12 +139,17 @@ public class MediaPlayerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if( mManager == null ) {
-            initMediaSessions();
-        }
 
+        initMediaSessions();
         handleIntent( intent );
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        mSession.release();
+        timer.cancel();
+        return super.onUnbind(intent);
     }
 
     private void initMediaSessions() {
@@ -208,125 +172,49 @@ public class MediaPlayerService extends Service {
         mSession.setCallback(new MediaSession.Callback(){
             @Override
             public boolean onMediaButtonEvent(final Intent mediaButtonIntent) {
-                Log.i(TAG, "GOT EVENT");
                 return super.onMediaButtonEvent(mediaButtonIntent);
             }
 
              @Override
              public void onPlay() {
                  super.onPlay();
-                 Log.e( "MediaPlayerService", "onPlay");
-
-                 if(currentSongPath == null){
-                     onSkipToNext();
-                     return;
-                 }
-                 if(mMediaPlayer != null && !mMediaPlayer.isPlaying()){
-                     startPlayback();
-                 }
-                 buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE ) );
+                 play();
              }
 
              @Override
              public void onPause() {
                  super.onPause();
-                 Log.e( "MediaPlayerService", "onPause");
-
-                 if(mMediaPlayer != null) {
-                     mMediaPlayer.pause();
-                 }
-                 buildNotification(generateAction(android.R.drawable.ic_media_play, "Play", ACTION_PLAY));
+                 pause();
              }
 
              @Override
              public void onSkipToNext() {
                  super.onSkipToNext();
-                 Log.e( "MediaPlayerService", "onSkipToNext");
-
-                 if(currentSongPath != null){
-                     CriteriaBL.applyCriteriaDB(mMediaPlayer, currentSongPath);
-                 }
-                 Song song = songBL.fetchNextSong();
-
-                 if(song != null && song.name != null && song.name.trim().length() > 0){
-                     currentSongPath = song.path;
-                     currentSongName = song.name;
-
-                     if(mMediaPlayer != null && mMediaPlayer.isPlaying()){
-                         mMediaPlayer.stop();
-                     }
-                     mMediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(currentSongPath));
-
-                     mmr = new MediaMetadataRetriever();
-                     mmr.setDataSource(getApplicationContext(), Uri.parse(currentSongPath));
-
-                     mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-
-                         @Override
-                         public void onCompletion(MediaPlayer mplayer) {
-                             try {
-                                 onSkipToNext();
-                             } catch (Exception e) {
-
-                                 e.printStackTrace();
-                             }
-                         }
-                     });
-
-                     startPlayback();
-                 }
-                 else{
-                     sendResult("Song list is empty!");
-                 }
-                 buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE  ) );
+                 skipToNext();
              }
 
              @Override
              public void onSkipToPrevious() {
                  super.onSkipToPrevious();
-                 Log.e( "MediaPlayerService", "onSkipToPrevious");
-
-                 if(mMediaPlayer != null) {
-                     mMediaPlayer.stop();
-
-                     try {
-                         mMediaPlayer.prepare();
-                         mMediaPlayer.seekTo(0);
-                         onPlay();
-                     } catch (IOException e) {
-                         e.printStackTrace();
-                     }
-                 }
-                 buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE ) );
+                 skipToPrevious();
              }
 
              @Override
              public void onFastForward() {
                  super.onFastForward();
-                 Log.e( "MediaPlayerService", "onFastForward");
-                 //Manipulate current media here
+                 fastForward();
              }
 
              @Override
              public void onRewind() {
                  super.onRewind();
-                 Log.e( "MediaPlayerService", "onRewind");
-                 //Manipulate current media here
+                 rewind();
              }
 
              @Override
              public void onStop() {
                  super.onStop();
-                 Log.e( "MediaPlayerService", "onStop");
-
-                 if(mMediaPlayer != null) {
-                     mMediaPlayer.stop();
-                 }
-                 NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-                 notificationManager.cancel( 1 );
-                 timer.cancel();
-                 Intent intent = new Intent( getApplicationContext(), MediaPlayerService.class );
-                 stopService( intent );
+                 stop();
              }
 
              @Override
@@ -342,13 +230,95 @@ public class MediaPlayerService extends Service {
         );
     }
 
-    @Override
-    public boolean onUnbind(Intent intent) {
-        mSession.release();
-        timer.cancel();
-        return super.onUnbind(intent);
+    //region Media functions
+    private void play(){
+        if(currentSongPath == null){
+            skipToNext();
+            return;
+        }
+        if(mMediaPlayer != null && !mMediaPlayer.isPlaying()){
+            startPlayback();
+        }
+        buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE ) );
     }
+    private void pause(){
+        if(mMediaPlayer != null) {
+            mMediaPlayer.pause();
+        }
+        buildNotification(generateAction(android.R.drawable.ic_media_play, "Play", ACTION_PLAY));
+    }
+    private void stop(){
 
+        if(mMediaPlayer != null) {
+            mMediaPlayer.stop();
+        }
+        NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel( 1 );
+        timer.cancel();
+        Intent intent = new Intent( getApplicationContext(), MediaPlayerService.class );
+        stopService( intent );
+    }
+    private void skipToNext(){
+
+        if(currentSongPath != null){
+            CriteriaBL.applyCriteriaDB(mMediaPlayer, currentSongPath);
+        }
+        Song song = songBL.fetchNextSong();
+
+        if(song != null && song.name != null && song.name.trim().length() > 0){
+            currentSongPath = song.path;
+            currentSongName = song.name;
+
+            if(mMediaPlayer != null && mMediaPlayer.isPlaying()){
+                mMediaPlayer.stop();
+            }
+            mMediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(currentSongPath));
+
+            mmr = new MediaMetadataRetriever();
+            mmr.setDataSource(getApplicationContext(), Uri.parse(currentSongPath));
+
+            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                @Override
+                public void onCompletion(MediaPlayer mplayer) {
+                    try {
+                        skipToNext();
+                    } catch (Exception e) {
+
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            startPlayback();
+        }
+        else{
+            sendResult("Song list is empty!");
+        }
+        buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE  ) );
+    }
+    private void skipToPrevious(){
+
+        if(mMediaPlayer != null) {
+            mMediaPlayer.stop();
+
+            try {
+                mMediaPlayer.prepare();
+                mMediaPlayer.seekTo(0);
+                play();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE ) );
+    }
+    private void fastForward(){
+
+    }
+    private void rewind(){
+
+    }
+    //endregion
     private void startPlayback(){
         CriteriaBL.loadInMemoryCriteria();
 
@@ -356,11 +326,40 @@ public class MediaPlayerService extends Service {
         timerFunction();
     }
 
-    public String getCurrentSongPath() {
-        return currentSongPath;
+    //region UI Broadcast
+    public void sendResult(String message) {
+        Intent intent = new Intent(MEDIA_PLAYER_RESULT);
+
+        if(message != null)
+            intent.putExtra(MEDIA_PLAYER_MSG, message);
+        broadcaster.sendBroadcast(intent);
     }
 
-    public void setCurrentSongPath(String currentSongPath) {
-        this.currentSongPath = currentSongPath;
+    public void updateUI() {
+        Intent intent = new Intent(MEDIA_PLAYER_INFO);
+
+        intent.putExtra(MP_NAME, currentSongName );
+        intent.putExtra(MP_DURATION, mMediaPlayer.getDuration() + "");
+        intent.putExtra(MP_CURRENT_POSITION, mMediaPlayer.getCurrentPosition() + "");
+
+        broadcaster.sendBroadcast(intent);
     }
+
+    public void timerFunction(){
+
+        timer.purge();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (mMediaPlayer != null) {
+                    updateUI();
+                } else {
+                    timer.cancel();
+                    timer.purge();
+                }
+            }
+        }, 0, 1000);
+    }
+    //endregion
 }

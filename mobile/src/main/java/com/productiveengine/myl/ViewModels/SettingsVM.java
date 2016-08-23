@@ -30,7 +30,6 @@ public class SettingsVM  extends BaseObservable implements Serializable{
     private boolean screenOn;
 
     private SettingsBL settingsBL;
-
     //-------------------------------
     private boolean hateTimeLimitChk;
     private boolean loveTimeLimitChk;

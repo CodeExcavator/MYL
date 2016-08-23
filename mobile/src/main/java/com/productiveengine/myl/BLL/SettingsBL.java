@@ -7,10 +7,6 @@ import com.productiveengine.myl.DomainClasses.Settings;
 
 import java.util.List;
 
-/**
- * Created by nifra on 30/07/2016.
- */
-
 public class SettingsBL {
     Settings settings;
 
@@ -35,7 +31,6 @@ public class SettingsBL {
 
     public void saveData(Settings settings){
         //TODO: Try catch, error handling
-        //Log.d(settings.loveTimeLimit+"","test");
         settings.save();
     }
 

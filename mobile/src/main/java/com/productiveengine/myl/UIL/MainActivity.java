@@ -20,6 +20,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,19 +30,19 @@ import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.productiveengine.myl.BLL.CriteriaBL;
-import com.productiveengine.myl.BLL.RefreshSongListTask;
+import com.productiveengine.myl.Async.RefreshSongListTask;
 import com.productiveengine.myl.Common.HateCriteria;
+import com.productiveengine.myl.Common.InputFilterMinMax;
 import com.productiveengine.myl.Common.LoveCriteria;
 import com.productiveengine.myl.Common.RequestCodes;
 import com.productiveengine.myl.Common.Util;
-import com.productiveengine.myl.UIL.Services.MediaPlayerService;
+import com.productiveengine.myl.Services.MediaPlayerService;
 import com.productiveengine.myl.UIL.databinding.FragmentPlayBinding;
 import com.productiveengine.myl.UIL.databinding.FragmentSettingsBinding;
 import com.productiveengine.myl.ViewModels.PlayVM;
@@ -422,7 +423,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
 
                 txtLoveTimeLimit = (EditText) rootView.findViewById(R.id.txtLoveTimeLimit);
                 txtLoveTimePercentage = (EditText) rootView.findViewById(R.id.txtLoveTimePercentage);
-                //txtLoveTimePercentage.setFilters(new InputFilter[]{ new InputFilterMinMax("1", "100")});
+                txtLoveTimePercentage.setFilters(new InputFilter[]{ new InputFilterMinMax("1", "100")});
                 //---------------------------------------------------------------------------------------
 
                 RadioButton btnHateTimeLimit = (RadioButton) rootView.findViewById(R.id.btnHateTimeLimit);
@@ -448,7 +449,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
 
                 txtHateTimeLimit = (EditText) rootView.findViewById(R.id.txtHateTimeLimit);
                 txtHateTimePercentage = (EditText) rootView.findViewById(R.id.txtHateTimePercentage);
-                //txtHateTimePercentage.setFilters(new InputFilter[]{ new InputFilterMinMax("1", "100")});
+                txtHateTimePercentage.setFilters(new InputFilter[]{ new InputFilterMinMax("1", "100")});
                 //---------------------------------------------------------------------------------------
             }
             else if(index == 1){

@@ -9,13 +9,8 @@ import com.productiveengine.myl.Common.HateCriteria;
 import com.productiveengine.myl.Common.LoveCriteria;
 import com.productiveengine.myl.Common.Util;
 import com.productiveengine.myl.DomainClasses.Settings;
-import com.productiveengine.myl.UIL.Services.MediaPlayerService;
 
 import java.io.File;
-
-/**
- * Created by Nikolaos on 20/08/2016.
- */
 
 public class CriteriaBL {
 

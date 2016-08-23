@@ -45,7 +45,7 @@
             </intent-filter>
         </activity>
 
-        <service android:enabled="true" android:name="com.productiveengine.myl.UIL.Services.MediaPlayerService"></service>
+        <service android:enabled="true" android:name="com.productiveengine.myl.Services.MediaPlayerService"></service>
     </application>
 
 </manifest>

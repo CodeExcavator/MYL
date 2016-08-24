@@ -48,8 +48,6 @@ public class MediaPlayerService extends Service {
     private MediaSession mSession;
     private MediaController mController;
     private MediaMetadataRetriever mmr;
-
-    private SettingsBL settingsBL;
     private SongBL songBL;
     private String currentSongPath;
     private String currentSongName;
@@ -61,7 +59,6 @@ public class MediaPlayerService extends Service {
     @Override
     public void onCreate() {
         broadcaster = LocalBroadcastManager.getInstance(this);
-        settingsBL = new SettingsBL();
         songBL = new SongBL();
     }
 

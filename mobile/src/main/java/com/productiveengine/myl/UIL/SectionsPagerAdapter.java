@@ -1,9 +1,5 @@
 package com.productiveengine.myl.UIL;
 
-/**
- * Created by nifra on 30/07/2016.
- */
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;

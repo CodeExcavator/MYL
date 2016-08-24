@@ -2,10 +2,6 @@ package com.productiveengine.myl.Common;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by Nikolaos on 20/08/2016.
- */
-
 public class Util {
 
     public static int convertTrackTimeToSeconds(int duration){

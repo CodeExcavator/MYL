@@ -9,7 +9,6 @@ import com.productiveengine.myl.Common.HateCriteria;
 import com.productiveengine.myl.Common.LoveCriteria;
 import com.productiveengine.myl.Common.Util;
 import com.productiveengine.myl.DomainClasses.Settings;
-import com.productiveengine.myl.UIL.R;
 
 import java.io.File;
 
@@ -129,26 +128,18 @@ public class CriteriaBL {
 
     public static boolean chkSettingsFolders(){
 
-        if(CriteriaBL.settings == null ||
+        return !(CriteriaBL.settings == null ||
                 CriteriaBL.settings.targetFolderPath == null ||
-                CriteriaBL.settings.rootFolderPath == null){
-            return false;
-        }
-        return true;
+                CriteriaBL.settings.rootFolderPath == null);
     }
 
     public static boolean chkSettingsHateLove(){
 
-        if(CriteriaBL.settings == null ||
+        return !(CriteriaBL.settings == null ||
                 (CriteriaBL.settings.hateTimeLimit == 0 &&
-                 CriteriaBL.settings.hateTimePercentage == 0 &&
-                 CriteriaBL.settings.loveTimeLimit == 0 &&
-                 CriteriaBL.settings.loveTimePercentage == 0
-                )
-            )
-        {
-            return false;
-        }
-        return true;
+                        CriteriaBL.settings.hateTimePercentage == 0 &&
+                        CriteriaBL.settings.loveTimeLimit == 0 &&
+                        CriteriaBL.settings.loveTimePercentage == 0
+                ));
     }
 }

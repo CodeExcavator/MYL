@@ -1,9 +1,5 @@
 package com.productiveengine.myl.Common;
 
-/**
- * Created by Nikolaos on 12/08/2016.
- */
-
 public enum HateCriteria {
     TIME_LIMIT, PERCENTAGE;
 

@@ -11,36 +11,38 @@ import android.media.MediaPlayer;
 import android.media.Rating;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
-import android.media.session.MediaSessionManager;
 import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
-
 import com.productiveengine.myl.BLL.CriteriaBL;
 import com.productiveengine.myl.BLL.SettingsBL;
 import com.productiveengine.myl.BLL.SongBL;
+import com.productiveengine.myl.Common.RequestCodes;
 import com.productiveengine.myl.DomainClasses.Song;
 import com.productiveengine.myl.UIL.R;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
+import static com.productiveengine.myl.Common.RequestCodes.MEDIA_PLAYER_INFO;
+import static com.productiveengine.myl.Common.RequestCodes.MEDIA_PLAYER_MSG;
+import static com.productiveengine.myl.Common.RequestCodes.MEDIA_PLAYER_RESULT;
+import static com.productiveengine.myl.Common.RequestCodes.MP_CURRENT_POSITION;
+import static com.productiveengine.myl.Common.RequestCodes.MP_DURATION;
+import static com.productiveengine.myl.Common.RequestCodes.MP_NAME;
+import static com.productiveengine.myl.Common.RequestCodes.ACTION_FAST_FORWARD;
+import static com.productiveengine.myl.Common.RequestCodes.ACTION_NEXT;
+import static com.productiveengine.myl.Common.RequestCodes.ACTION_PAUSE;
+import static com.productiveengine.myl.Common.RequestCodes.ACTION_PLAY;
+import static com.productiveengine.myl.Common.RequestCodes.ACTION_PREVIOUS;
+import static com.productiveengine.myl.Common.RequestCodes.ACTION_REWIND;
+import static com.productiveengine.myl.Common.RequestCodes.ACTION_STOP;
 
 public class MediaPlayerService extends Service {
 
     private static final String TAG = MediaPlayerService.class.getName();
-
-    public static final String ACTION_PLAY = "action_play";
-    public static final String ACTION_PAUSE = "action_pause";
-    public static final String ACTION_REWIND = "action_rewind";
-    public static final String ACTION_FAST_FORWARD = "action_fast_forward";
-    public static final String ACTION_NEXT = "action_next";
-    public static final String ACTION_PREVIOUS = "action_previous";
-    public static final String ACTION_STOP = "action_stop";
 
     private MediaPlayer mMediaPlayer;
     private MediaSession mSession;
@@ -53,12 +55,6 @@ public class MediaPlayerService extends Service {
     private String currentSongName;
 
     LocalBroadcastManager broadcaster;
-    static final public String MEDIA_PLAYER_RESULT = "com.productiveengine.myl.Services.MediaPlayerService.MEDIA_PLAYER_RESULT";
-    static final public String MEDIA_PLAYER_MSG = "com.productiveengine.myl.Services.MediaPlayerService.MEDIA_PLAYER_MSG";
-    static final public String MEDIA_PLAYER_INFO = "com.productiveengine.myl.Services.MediaPlayerService.MEDIA_PLAYER_INFO";
-    static final public String MP_NAME = "com.productiveengine.myl.Services.MediaPlayerService.MP_NAME";
-    static final public String MP_DURATION = "com.productiveengine.myl.Services.MediaPlayerService.MP_DURATION";
-    static final public String MP_CURRENT_POSITION = "com.productiveengine.myl.Services.MediaPlayerService.MP_CURRENT_POSITION";
 
     final Timer timer = new Timer();
 
@@ -232,6 +228,8 @@ public class MediaPlayerService extends Service {
 
     //region Media functions
     private void play(){
+
+        if(!chkSettings()){ return; }
         if(currentSongPath == null){
             skipToNext();
             return;
@@ -259,6 +257,8 @@ public class MediaPlayerService extends Service {
         stopService( intent );
     }
     private void skipToNext(){
+
+        if(!chkSettings()){ return; }
 
         if(currentSongPath != null){
             CriteriaBL.applyCriteriaDB(mMediaPlayer, currentSongPath);
@@ -293,7 +293,7 @@ public class MediaPlayerService extends Service {
             startPlayback();
         }
         else{
-            sendResult("Song list is empty!");
+            sendResult(getString(R.string.pressRefresh));
         }
         buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE  ) );
     }
@@ -319,20 +319,27 @@ public class MediaPlayerService extends Service {
 
     }
     //endregion
+    private boolean chkSettings(){
+        if(!CriteriaBL.chkSettingsFolders()){
+            sendResult(getString(R.string.setRootAndTarget));
+            return false;
+        }
+        if(!CriteriaBL.chkSettingsHateLove()){
+            sendResult(getString(R.string.setCriteria));
+            return false;
+        }
+        return true;
+    }
+
     private void startPlayback(){
         CriteriaBL.loadInMemoryCriteria();
 
         mMediaPlayer.start();
         timerFunction();
     }
-
     //region UI Broadcast
-    public void sendResult(String message) {
-        Intent intent = new Intent(MEDIA_PLAYER_RESULT);
-
-        if(message != null)
-            intent.putExtra(MEDIA_PLAYER_MSG, message);
-        broadcaster.sendBroadcast(intent);
+    public void sendResult(String msg){
+        RequestCodes.broadcastInfo(broadcaster, MEDIA_PLAYER_RESULT , MEDIA_PLAYER_MSG, msg);
     }
 
     public void updateUI() {

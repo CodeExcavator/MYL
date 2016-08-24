@@ -9,6 +9,7 @@ import com.productiveengine.myl.Common.HateCriteria;
 import com.productiveengine.myl.Common.LoveCriteria;
 import com.productiveengine.myl.Common.Util;
 import com.productiveengine.myl.DomainClasses.Settings;
+import com.productiveengine.myl.UIL.R;
 
 import java.io.File;
 
@@ -38,9 +39,8 @@ public class CriteriaBL {
             File songFile = new File(currentSongPath);
             //Delete from DB
             songBL.deleteByPath(currentSongPath);
-            //Get settings from DB
-            //(keep staticly in memory for UI access)
-            settings = settingsBL.initializeSettingsFromDB();
+            //--------------------------------------------------------------------------
+            loadInMemoryCriteria();
 
             double completionPercentage = (((double) currentPosition) / duration) * 100;
 
@@ -83,6 +83,8 @@ public class CriteriaBL {
     }
 
     public static void loadInMemoryCriteria(){
+        //Get settings from DB
+        //(keep staticly in memory for UI access)
         settings = settingsBL.initializeSettingsFromDB();
     }
 
@@ -122,7 +124,31 @@ public class CriteriaBL {
                 }
                 break;
         }
-
         return color;
+    }
+
+    public static boolean chkSettingsFolders(){
+
+        if(CriteriaBL.settings == null ||
+                CriteriaBL.settings.targetFolderPath == null ||
+                CriteriaBL.settings.rootFolderPath == null){
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean chkSettingsHateLove(){
+
+        if(CriteriaBL.settings == null ||
+                (CriteriaBL.settings.hateTimeLimit == 0 &&
+                 CriteriaBL.settings.hateTimePercentage == 0 &&
+                 CriteriaBL.settings.loveTimeLimit == 0 &&
+                 CriteriaBL.settings.loveTimePercentage == 0
+                )
+            )
+        {
+            return false;
+        }
+        return true;
     }
 }

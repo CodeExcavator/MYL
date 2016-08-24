@@ -53,7 +53,7 @@ public class RefreshSongListTask extends AsyncTask<Void, Void, Void> {
         settings = (new SettingsBL()).initializeSettingsFromDB();
 
         if(settings.rootFolderPath != null && settings.rootFolderPath.trim().length() > 0){
-            songList = new ArrayList<Song>();
+            songList = new ArrayList<>();
             traverse(new File(settings.rootFolderPath));
             songBL.saveAll(songList);
         }

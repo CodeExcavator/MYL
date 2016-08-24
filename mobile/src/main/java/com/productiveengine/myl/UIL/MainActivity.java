@@ -52,6 +52,18 @@ import java.io.File;
 
 import ar.com.daidalos.afiledialog.FileChooserActivity;
 
+import static com.productiveengine.myl.Common.RequestCodes.ACTION_NEXT;
+import static com.productiveengine.myl.Common.RequestCodes.ACTION_PAUSE;
+import static com.productiveengine.myl.Common.RequestCodes.ACTION_PLAY;
+import static com.productiveengine.myl.Common.RequestCodes.ACTION_PREVIOUS;
+import static com.productiveengine.myl.Common.RequestCodes.ACTION_STOP;
+import static com.productiveengine.myl.Common.RequestCodes.MEDIA_PLAYER_INFO;
+import static com.productiveengine.myl.Common.RequestCodes.MEDIA_PLAYER_MSG;
+import static com.productiveengine.myl.Common.RequestCodes.MEDIA_PLAYER_RESULT;
+import static com.productiveengine.myl.Common.RequestCodes.MP_CURRENT_POSITION;
+import static com.productiveengine.myl.Common.RequestCodes.MP_DURATION;
+import static com.productiveengine.myl.Common.RequestCodes.MP_NAME;
+
 public class MainActivity extends AppCompatActivity implements AudioManager.OnAudioFocusChangeListener{
 
     private AudioManager mAudioManager;
@@ -72,23 +84,10 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
      */
     private ViewPager mViewPager;
     //----------------------------
-    private static long selected_song_id = 0;
-    private static long playing_now_song_id = 0;
-
-    //My Locks
-    public static boolean initialPlay = true;
-    private boolean playOrPause = true;
-
     public void informAudioService(String action){
         Intent intent = new Intent( getApplicationContext(), MediaPlayerService.class );
         intent.setAction( action );
         startService( intent );
-    }
-    //----------------------------------------------------------
-    public void onTargetFolderClicked(View v){
-        Intent intent = new Intent(this, FileChooserActivity.class);
-        intent.putExtra(FileChooserActivity.INPUT_FOLDER_MODE, true);
-        this.startActivityForResult(intent, RequestCodes.CHOOSE_TARGET_FOLDER);
     }
     //----------------------------------------------------------
     @Override
@@ -100,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
 
-                    informAudioService(MediaPlayerService.ACTION_STOP);
+                    informAudioService(ACTION_STOP);
                     finish();
 
                 } })
@@ -190,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         msgReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String s = intent.getStringExtra(MediaPlayerService.MEDIA_PLAYER_MSG);
+                String s = intent.getStringExtra(MEDIA_PLAYER_MSG);
 
                 TextView txtCurrentSong = (TextView) findViewById(R.id.txtCurrentSong);
                 txtCurrentSong.setText("");
@@ -204,9 +203,9 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         infoReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String songName = intent.getStringExtra(MediaPlayerService.MP_NAME);
-                String durationS = intent.getStringExtra(MediaPlayerService.MP_DURATION);
-                String currentPositionS = intent.getStringExtra(MediaPlayerService.MP_CURRENT_POSITION);
+                String songName = intent.getStringExtra(MP_NAME);
+                String durationS = intent.getStringExtra(MP_DURATION);
+                String currentPositionS = intent.getStringExtra(MP_CURRENT_POSITION);
 
                 TextView txtCurrentSong = (TextView) findViewById(R.id.txtCurrentSong);
                 txtCurrentSong.setText(songName);
@@ -279,10 +278,10 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
     protected void onStart() {
         super.onStart();
         LocalBroadcastManager.getInstance(this).registerReceiver((msgReceiver),
-                new IntentFilter(MediaPlayerService.MEDIA_PLAYER_RESULT)
+                new IntentFilter(MEDIA_PLAYER_RESULT)
         );
         LocalBroadcastManager.getInstance(this).registerReceiver((infoReceiver),
-                new IntentFilter(MediaPlayerService.MEDIA_PLAYER_INFO)
+                new IntentFilter(MEDIA_PLAYER_INFO)
         );
     }
 
@@ -316,9 +315,9 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
     @Override
     public void onAudioFocusChange(int focusChange) {
         if(focusChange<=0) {
-            informAudioService(MediaPlayerService.ACTION_PAUSE);
+            informAudioService(ACTION_PAUSE);
         } else {
-            informAudioService(MediaPlayerService.ACTION_PLAY);
+            informAudioService(ACTION_PLAY);
         }
     }
 
@@ -423,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
 
                 txtLoveTimeLimit = (EditText) rootView.findViewById(R.id.txtLoveTimeLimit);
                 txtLoveTimePercentage = (EditText) rootView.findViewById(R.id.txtLoveTimePercentage);
-                txtLoveTimePercentage.setFilters(new InputFilter[]{ new InputFilterMinMax("1", "100")});
+                txtLoveTimePercentage.setFilters(new InputFilter[]{ new InputFilterMinMax("0", "100")});
                 //---------------------------------------------------------------------------------------
 
                 RadioButton btnHateTimeLimit = (RadioButton) rootView.findViewById(R.id.btnHateTimeLimit);
@@ -449,7 +448,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
 
                 txtHateTimeLimit = (EditText) rootView.findViewById(R.id.txtHateTimeLimit);
                 txtHateTimePercentage = (EditText) rootView.findViewById(R.id.txtHateTimePercentage);
-                txtHateTimePercentage.setFilters(new InputFilter[]{ new InputFilterMinMax("1", "100")});
+                txtHateTimePercentage.setFilters(new InputFilter[]{ new InputFilterMinMax("0", "100")});
                 //---------------------------------------------------------------------------------------
             }
             else if(index == 1){
@@ -526,25 +525,39 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         //Play -------------------------------------------------------------------------------
         public void onRefreshSongListClicked(View v){
             MainActivity ma = (MainActivity) this.getActivity();
-            ma.informAudioService(MediaPlayerService.ACTION_STOP);
+            ma.informAudioService(ACTION_STOP);
 
+            CriteriaBL.loadInMemoryCriteria();
+
+            if(!CriteriaBL.chkSettingsFolders()){
+                ma.openDialog(getString(R.string.setRootAndTarget));
+                return;
+            }
+            if(!CriteriaBL.chkSettingsHateLove()){
+                ma.openDialog(getString(R.string.setCriteria));
+                return;
+            }
             AsyncTask task = new RefreshSongListTask(ma).execute();
         }
         public void onPlayClicked(View v){
             MainActivity ma = (MainActivity) this.getActivity();
-            ma.informAudioService(MediaPlayerService.ACTION_PLAY);
+            CriteriaBL.loadInMemoryCriteria();
+            ma.informAudioService(ACTION_PLAY);
         }
         public void onPauseClicked(View v){
             MainActivity ma = (MainActivity) this.getActivity();
-            ma.informAudioService(MediaPlayerService.ACTION_PAUSE);
+            CriteriaBL.loadInMemoryCriteria();
+            ma.informAudioService(ACTION_PAUSE);
         }
         public void onReplayClicked(View v){
             MainActivity ma = (MainActivity) this.getActivity();
-            ma.informAudioService(MediaPlayerService.ACTION_PREVIOUS);
+            CriteriaBL.loadInMemoryCriteria();
+            ma.informAudioService(ACTION_PREVIOUS);
         }
         public void onNextClicked(View v){
             MainActivity ma = (MainActivity) this.getActivity();
-            ma.informAudioService(MediaPlayerService.ACTION_NEXT);
+            CriteriaBL.loadInMemoryCriteria();
+            ma.informAudioService(ACTION_NEXT);
         }
         //Settings -------------------------------------------------------------------------------
         public void onRootFolderClicked(View v){

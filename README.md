@@ -1,8 +1,8 @@
-# MYL
+# MYL (Music You Love)
 Music you love is an Android audio player focused on sorting out which songs you truly love.
 
 #Features
-* MVVM patter using the Android Data Binding Library
+* MVVM pattern using the Android Data Binding Library
 * Audio playback
   - MediaPlayer
   - MediaSessionManager 

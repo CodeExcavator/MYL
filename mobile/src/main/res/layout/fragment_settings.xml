@@ -100,7 +100,7 @@
                 />
             <RadioGroup
                 android:id="@+id/radioGroupHate"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <RadioButton
                     android:id="@+id/btnHateTimeLimit"
@@ -109,18 +109,59 @@
                     android:text= "@string/loveTimeLimit"
                     android:checked="@={settingsVM.hateTimeLimitChk}" />
 
-                <EditText
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:text="@={`` + settingsVM.hateTimeLimit}"
-                    android:ems="10"
-                    android:id="@+id/txtHateTimeLimit"
-                    android:enabled="@{settingsVM.hateTimeLimitChk}"
+                    android:orientation="horizontal"
                     android:gravity="right"
-                    android:textAlignment="gravity"
-                    android:layout_marginRight="10dp"/>
+                    android:layout_marginRight="5dp">
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        />
+                    <Button
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:id="@+id/btnMinusHateTime"
+                        android:background="@drawable/blue_button"
+                        />
 
+                    <!-- TWO WAY BINDING
+                    <EditText
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:text="@={`` + settingsVM.hateTimeLimit}"
+                        android:ems="5"
+                        android:id="@+id/txtHateTimeLimit"
+                        android:enabled="@{settingsVM.hateTimeLimitChk}"
+                        android:gravity="right"
+                        android:textAlignment="gravity"
+                        />
+-->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:text="@{Integer.toString(settingsVM.hateTimeLimit)}"
+                        android:ems="5"
+                        android:id="@+id/txtHateTimeLimit"
+                        android:gravity="right"
+                        android:textAlignment="gravity"
+                        />
+                    <Button
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+"
+                        android:id="@+id/btnPlusHateTime"
+                        android:background="@drawable/blue_button"
+
+                       />
+                </LinearLayout>
                 <RadioButton
                     android:id="@+id/btnHatePercentage"
                     android:layout_width="wrap_content"
@@ -128,17 +169,43 @@
                     android:text="@string/loveTimePercentage"
                     android:checked="@={!settingsVM.hateTimeLimitChk}"
                     />
-                <EditText
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:text="@={`` + settingsVM.hateTimePercentage}"
-                    android:ems="10"
-                    android:id="@+id/txtHateTimePercentage"
-                    android:enabled="@{!settingsVM.hateTimeLimitChk}"
+                    android:orientation="horizontal"
                     android:gravity="right"
-                    android:textAlignment="gravity"
-                    android:layout_marginRight="10dp"/>
+                    android:layout_marginRight="5dp">
+
+                    <Button
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:id="@+id/btnMinusHatePercentage"
+                        android:background="@drawable/blue_button"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:text="@{Integer.toString(settingsVM.hateTimePercentage)}"
+                        android:ems="5"
+                        android:id="@+id/txtHateTimePercentage"
+                        android:gravity="right"
+                        android:textAlignment="gravity"
+                        android:layout_marginRight="5dp"/>
+
+                    <Button
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+"
+                        android:id="@+id/btnPlusHatePercentage"
+                        android:background="@drawable/blue_button"
+
+                        />
+                </LinearLayout>
             </RadioGroup>
             <View android:id="@+id/loveDivisor"
                 android:layout_height="2dp"
@@ -152,7 +219,7 @@
                 />
             <RadioGroup
                 android:id="@+id/radioGroupLove"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <RadioButton
                     android:id="@+id/btnLoveTimeLimit"
@@ -161,35 +228,81 @@
                     android:text= "@string/loveTimeLimit"
                     android:checked="@={settingsVM.loveTimeLimitChk}"
                     />
-                <EditText
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:text="@={`` + settingsVM.loveTimeLimit}"
-                    android:ems="10"
-                    android:id="@+id/txtLoveTimeLimit"
-                    android:enabled="@{settingsVM.loveTimeLimitChk}"
+                    android:orientation="horizontal"
                     android:gravity="right"
-                    android:textAlignment="gravity"
-                    android:layout_marginRight="10dp"/>
+                    android:layout_marginRight="5dp">
+                    <Button
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:id="@+id/btnMinusLoveTime"
+                        android:background="@drawable/blue_button"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:text="@{Integer.toString(settingsVM.loveTimeLimit)}"
+                        android:ems="5"
+                        android:id="@+id/txtLoveTimeLimit"
+                        android:gravity="right"
+                        android:textAlignment="gravity"
+                        />
+
+                    <Button
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+"
+                        android:id="@+id/btnPlusLoveTime"
+                        android:background="@drawable/blue_button"
+                        />
+                </LinearLayout>
                 <RadioButton
                     android:id="@+id/btnLovePercentage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/loveTimePercentage"
-                    android:checked="@={!settingsVM.loveTimeLimitChk}"
+                    android:checked="@{!settingsVM.loveTimeLimitChk}"
                     />
-                <EditText
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:text="@={`` + settingsVM.loveTimePercentage}"
-                    android:id="@+id/txtLoveTimePercentage"
-                    android:enabled="@{!settingsVM.loveTimeLimitChk}"
-                    android:gravity="right"
-                    android:textAlignment="gravity"
-                    android:layout_marginRight="10dp"
-                    />
+                    android:orientation="horizontal"
+                    android:gravity="right">
+                    <Button
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="-"
+                        android:id="@+id/btnMinusLovePercentage"
+                        android:background="@drawable/blue_button"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:ems="5"
+                        android:text="@{Integer.toString(settingsVM.loveTimePercentage)}"
+                        android:id="@+id/txtLoveTimePercentage"
+                        android:gravity="right"
+                        android:textAlignment="gravity"
+                        />
+                    <Button
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+"
+                        android:id="@+id/btnPlusLovePercentage"
+                        android:background="@drawable/blue_button"
+                        />
+                </LinearLayout>
             </RadioGroup>
         </LinearLayout>
     </ScrollView>

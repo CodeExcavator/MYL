@@ -98,10 +98,8 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
             .setMessage("Are you sure you want to exit M.Y.L. ?")
             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-
                     informAudioService(ACTION_STOP);
                     finish();
-
                 } })
             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
@@ -536,14 +534,15 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
 
         private void initializeMinusPlusButtons(View rootView){
 
-
             btnMinusHateTime = (Button) rootView.findViewById(R.id.btnMinusHateTime);
             btnMinusHateTime.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View v)
                 {
-                    settingsVM.setHateTimeLimit(settingsVM.getHateTimeLimit()-1);
+                    if(settingsVM.getHateTimeLimit() > 0) {
+                        settingsVM.setHateTimeLimit(settingsVM.getHateTimeLimit() - 1);
+                    }
                 }
             });
             btnMinusHatePercentage = (Button) rootView.findViewById(R.id.btnMinusHatePercentage);
@@ -552,7 +551,9 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                 @Override
                 public void onClick(View v)
                 {
-                    settingsVM.setHateTimePercentage(settingsVM.getHateTimePercentage()-1);
+                    if(settingsVM.getHateTimePercentage() > 0) {
+                        settingsVM.setHateTimePercentage(settingsVM.getHateTimePercentage() - 1);
+                    }
                 }
             });
             btnPlusHateTime = (Button) rootView.findViewById(R.id.btnPlusHateTime);
@@ -570,7 +571,9 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                 @Override
                 public void onClick(View v)
                 {
-                    settingsVM.setHateTimePercentage(settingsVM.getHateTimePercentage()+1);
+                    if(settingsVM.getHateTimePercentage() < 100) {
+                        settingsVM.setHateTimePercentage(settingsVM.getHateTimePercentage() + 1);
+                    }
                 }
             });
 
@@ -580,7 +583,9 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                 @Override
                 public void onClick(View v)
                 {
-                    settingsVM.setLoveTimeLimit(settingsVM.getLoveTimeLimit()-1);
+                    if(settingsVM.getLoveTimeLimit() > 0) {
+                        settingsVM.setLoveTimeLimit(settingsVM.getLoveTimeLimit() - 1);
+                    }
                 }
             });
             btnMinusLovePercentage = (Button) rootView.findViewById(R.id.btnMinusLovePercentage);
@@ -589,7 +594,9 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                 @Override
                 public void onClick(View v)
                 {
-                    settingsVM.setLoveTimePercentage(settingsVM.getLoveTimePercentage()-1);
+                    if(settingsVM.getLoveTimePercentage() > 0) {
+                        settingsVM.setLoveTimePercentage(settingsVM.getLoveTimePercentage() - 1);
+                    }
                 }
             });
             btnPlusLoveTime = (Button) rootView.findViewById(R.id.btnPlusLoveTime);
@@ -607,9 +614,15 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                 @Override
                 public void onClick(View v)
                 {
-                    settingsVM.setLoveTimePercentage(settingsVM.getLoveTimePercentage()+1);
+                    if(settingsVM.getLoveTimePercentage() < 100) {
+                        settingsVM.setLoveTimePercentage(settingsVM.getLoveTimePercentage() + 1);
+                    }
                 }
             });
+
+            //-------------------------------------
+            toggleHateCriteria(settingsVM.isHateTimeLimitChk());
+            toggleLoveCriteria(settingsVM.isLoveTimeLimitChk());
         }
         //Play -------------------------------------------------------------------------------
         public void onRefreshSongListClicked(View v){
@@ -669,38 +682,30 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                 case R.id.btnLoveTimeLimit:
                     if (checked){
                         settingsVM.setLoveCriteria(LoveCriteria.TIME_LIMIT);
-
-                        txtLoveTimeLimit.setEnabled(true);
-                        btnMinusLoveTime.setEnabled(true);
-                        btnPlusLoveTime.setEnabled(true);
-
-                        txtLoveTimePercentage.setEnabled(false);
-                        btnMinusLovePercentage.setEnabled(false);
-                        btnPlusLovePercentage.setEnabled(false);
-
+                        toggleLoveCriteria(true);
                         settingsVM.setLoveTimePercentage(0);
-                        settingsVM.setLoveTimeLimitChk(true);
                     }
                 break;
 
                 case R.id.btnLovePercentage:
                     if (checked){
                         settingsVM.setLoveCriteria(LoveCriteria.PERCENTAGE);
-
-                        txtLoveTimeLimit.setEnabled(false);
-                        btnMinusLoveTime.setEnabled(false);
-                        btnPlusLoveTime.setEnabled(false);
-
-                        txtLoveTimePercentage.setEnabled(true);
-                        btnMinusLovePercentage.setEnabled(true);
-                        btnPlusLovePercentage.setEnabled(true);
-
+                        toggleLoveCriteria(false);
                         settingsVM.setLoveTimeLimit(0);
-                        settingsVM.setLoveTimeLimitChk(false);
                     }
                 break;
             }
+        }
+        private void toggleLoveCriteria(boolean value){
+            txtLoveTimeLimit.setEnabled(value);
+            btnMinusLoveTime.setEnabled(value);
+            btnPlusLoveTime.setEnabled(value);
 
+            txtLoveTimePercentage.setEnabled(!value);
+            btnMinusLovePercentage.setEnabled(!value);
+            btnPlusLovePercentage.setEnabled(!value);
+
+            settingsVM.setLoveTimeLimitChk(value);
         }
         public void onHateCriteriaChanged(View v) {
 
@@ -710,37 +715,30 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                 case R.id.btnHateTimeLimit:
                     if (checked){
                         settingsVM.setHateCriteria(HateCriteria.TIME_LIMIT);
-
-                        txtHateTimeLimit.setEnabled(true);
-                        btnMinusHateTime.setEnabled(true);
-                        btnPlusHateTime.setEnabled(true);
-
-                        txtHateTimePercentage.setEnabled(false);
-                        btnMinusHatePercentage.setEnabled(false);
-                        btnPlusHatePercentage.setEnabled(false);
-                        
+                        toggleHateCriteria(true);
                         settingsVM.setHateTimePercentage(0);
-                        settingsVM.setHateTimeLimitChk(true);
                     }
                     break;
 
                 case R.id.btnHatePercentage:
                     if (checked){
                         settingsVM.setHateCriteria(HateCriteria.PERCENTAGE);
-
-                        txtHateTimeLimit.setEnabled(false);
-                        btnMinusHateTime.setEnabled(false);
-                        btnPlusHateTime.setEnabled(false);
-
-                        txtHateTimePercentage.setEnabled(true);
-                        btnMinusHatePercentage.setEnabled(true);
-                        btnPlusHatePercentage.setEnabled(true);
-                        
+                        toggleHateCriteria(false);
                         settingsVM.setHateTimeLimit(0);
-                        settingsVM.setHateTimeLimitChk(false);
                     }
                     break;
             }
+        }
+        private void toggleHateCriteria(boolean value){
+            txtHateTimeLimit.setEnabled(value);
+            btnMinusHateTime.setEnabled(value);
+            btnPlusHateTime.setEnabled(value);
+
+            txtHateTimePercentage.setEnabled(!value);
+            btnMinusHatePercentage.setEnabled(!value);
+            btnPlusHatePercentage.setEnabled(!value);
+
+            settingsVM.setHateTimeLimitChk(value);
         }
     }
 }

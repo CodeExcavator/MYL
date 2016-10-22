@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     informAudioService(ACTION_STOP);
+                    abandonAudioFocus();
                     finish();
                 } })
             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -206,7 +207,11 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                 String currentPositionS = intent.getStringExtra(MP_CURRENT_POSITION);
 
                 TextView txtCurrentSong = (TextView) findViewById(R.id.txtCurrentSong);
-                txtCurrentSong.setText(songName);
+
+                if(txtCurrentSong != null)
+                {
+                    txtCurrentSong.setText(songName);
+                }
 
                 int durationMS = 0;
                 int currentPositionMS = 0;
@@ -227,35 +232,39 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                 }
 
                 TextView txtSongSate = (TextView) findViewById(R.id.txtSongState);
-                txtSongSate.setText(Util.milliSecondsToTimer(currentPositionMS) + "/" +
-                        Util.milliSecondsToTimer(durationMS) +" " +
-                        String.format("%.2f", percentage) + "%");
+
+                if(txtSongSate != null) {
+                    txtSongSate.setText(Util.milliSecondsToTimer(currentPositionMS) + "/" +
+                            Util.milliSecondsToTimer(durationMS) + " " +
+                            String.format("%.2f", percentage) + "%");
+                }
 
                 SeekBar musicSeekBar = (SeekBar) findViewById(R.id.musicSeekBar);
 
-                if(musicSeekBar != null){
-                    musicSeekBar.setProgress((int) percentage);
+                if(musicSeekBar != null) {
+                    if (musicSeekBar != null) {
+                        musicSeekBar.setProgress((int) percentage);
 
-                    if(android.os.Build.VERSION.SDK_INT >= 11){
-                        // will update the "progress" propriety of seekbar until it reaches progress
-                        ObjectAnimator animation = ObjectAnimator.ofInt(musicSeekBar, "progress", (int) percentage);
-                        animation.setDuration(500); // 0.5 second
-                        animation.setInterpolator(new DecelerateInterpolator());
-                        animation.start();
+                        if (android.os.Build.VERSION.SDK_INT >= 11) {
+                            // will update the "progress" propriety of seekbar until it reaches progress
+                            ObjectAnimator animation = ObjectAnimator.ofInt(musicSeekBar, "progress", (int) percentage);
+                            animation.setDuration(500); // 0.5 second
+                            animation.setInterpolator(new DecelerateInterpolator());
+                            animation.start();
+                        } else
+                            musicSeekBar.setProgress((int) percentage); // no animation on Gingerbread or lower
                     }
-                    else
-                        musicSeekBar.setProgress((int) percentage); // no animation on Gingerbread or lower
+
+                    //musicSeekBar.setBackgroundColor(CriteriaBL.applyCriteriaInMemory_SeekbarColor(currentPosition, percentage));
+                    int seekbarColor = CriteriaBL.applyCriteriaInMemory_SeekbarColor(currentPosition, percentage);
+
+                    musicSeekBar.getProgressDrawable().setColorFilter(seekbarColor, PorterDuff.Mode.SRC_IN);
+                    musicSeekBar.getThumb().setColorFilter(seekbarColor, PorterDuff.Mode.SRC_IN);
                 }
-
-                //musicSeekBar.setBackgroundColor(CriteriaBL.applyCriteriaInMemory_SeekbarColor(currentPosition, percentage));
-                int seekbarColor = CriteriaBL.applyCriteriaInMemory_SeekbarColor(currentPosition, percentage);
-
-                musicSeekBar.getProgressDrawable().setColorFilter(seekbarColor, PorterDuff.Mode.SRC_IN);
-                musicSeekBar.getThumb().setColorFilter(seekbarColor, PorterDuff.Mode.SRC_IN);
             }
         };
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+        gainAudioFocus();
     }
 
     private void openDialog(String msg){
@@ -270,7 +279,6 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
     @Override
     public void onDestroy(){
         super.onDestroy();
-        mAudioManager.abandonAudioFocus(this);
     }
     @Override
     protected void onStart() {
@@ -285,9 +293,14 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
 
     @Override
     protected void onStop() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(msgReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(infoReceiver);
         super.onStop();
+        //LocalBroadcastManager.getInstance(this).unregisterReceiver(msgReceiver);
+        //LocalBroadcastManager.getInstance(this).unregisterReceiver(infoReceiver);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        gainAudioFocus();
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -309,7 +322,6 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
 
         return super.onOptionsItemSelected(item);
     }
-
     @Override
     public void onAudioFocusChange(int focusChange) {
         if(focusChange<=0) {
@@ -318,7 +330,14 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
             informAudioService(ACTION_PLAY);
         }
     }
-
+    //----------
+    public void abandonAudioFocus(){
+        mAudioManager.abandonAudioFocus(this);
+    }
+    public void gainAudioFocus(){
+        mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+    }
+    //----------
     /**
      * A placeholder fragment containing a simple view.
      */

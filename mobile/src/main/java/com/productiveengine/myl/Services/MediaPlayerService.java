@@ -272,7 +272,13 @@ public class MediaPlayerService extends Service {
             mMediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(currentSongPath));
 
             mmr = new MediaMetadataRetriever();
-            mmr.setDataSource(getApplicationContext(), Uri.parse(currentSongPath));
+
+            try {
+                mmr.setDataSource(getApplicationContext(), Uri.parse(currentSongPath));
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
 
             mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 

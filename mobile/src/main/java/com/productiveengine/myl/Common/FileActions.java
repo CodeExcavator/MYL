@@ -71,7 +71,6 @@ public class FileActions {
         }
 
     }
-
     public void deleteFile(String inputPath, String inputFile) {
         try {
             // delete the original file
@@ -81,7 +80,6 @@ public class FileActions {
             Log.e(TAG, e.getMessage());
         }
     }
-
     public void copyFile(String inputPath, String inputFile, String outputPath) {
 
         InputStream in = null;
@@ -118,7 +116,7 @@ public class FileActions {
             Log.e(TAG, e.getMessage());
         }
     }
-    private String fixSameNameFiles(String path, String name){
+    public String fixSameNameFiles(String path, String name){
         String outputPath = "";
 
         File file = new File(path +"/" + name);
@@ -156,7 +154,7 @@ public class FileActions {
                     for(int i = 0; i < nameSplit.length - 1; i++ ){
                         fileName += nameSplit[i] + "_";
                     }
-                    fileName = fileName + increment;
+                    fileName = fileName + (++increment);
                 }
                 catch(Exception ex){
                     ex.printStackTrace();

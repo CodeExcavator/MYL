@@ -31,7 +31,7 @@ public class RefreshSongListTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        this.dialog.setMessage("Progress start");
+        this.dialog.setMessage("Processing...");
         this.dialog.setCancelable(false);
         this.dialog.show();
     }
@@ -55,6 +55,7 @@ public class RefreshSongListTask extends AsyncTask<Void, Void, Void> {
         if(settings.rootFolderPath != null && settings.rootFolderPath.trim().length() > 0){
             songList = new ArrayList<>();
             traverse(new File(settings.rootFolderPath));
+            songBL.clearAll();
             songBL.saveAll(songList);
         }
     }

@@ -155,6 +155,16 @@ public class FileActions {
                         fileName += nameSplit[i] + "_";
                     }
                     fileName = fileName + (++increment);
+
+                    while((new File(path + "/" + fileName + fileNameExt)).exists()){
+                        fileName = "";
+
+                        for(int i = 0; i < nameSplit.length - 1; i++ ){
+                            fileName += nameSplit[i] + "_";
+                        }
+                        fileName = fileName + (++increment);
+                    }
+
                 }
                 catch(Exception ex){
                     ex.printStackTrace();

@@ -44,4 +44,23 @@ public class SongBL implements Serializable{
                 .from(Song.class)
                 .execute();
     }
+
+    public int countAll() {
+        return new Select()
+                .from(Song.class)
+                .count();
+    }
+
+    public void clearAll() {
+
+        ActiveAndroid.beginTransaction();
+
+        try {
+            new Delete().from(Song.class).execute();
+            ActiveAndroid.setTransactionSuccessful();
+        }
+        finally {
+            ActiveAndroid.endTransaction();
+        }
+    }
 }

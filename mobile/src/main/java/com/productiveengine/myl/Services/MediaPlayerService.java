@@ -269,33 +269,38 @@ public class MediaPlayerService extends Service {
             if(mMediaPlayer != null && mMediaPlayer.isPlaying()){
                 mMediaPlayer.stop();
             }
+
             mMediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(currentSongPath));
 
             mmr = new MediaMetadataRetriever();
 
             try {
                 mmr.setDataSource(getApplicationContext(), Uri.parse(currentSongPath));
+
+                mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                    @Override
+                    public void onCompletion(MediaPlayer mplayer) {
+                        try {
+                            skipToNext();
+                        } catch (Exception e) {
+
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+                startPlayback();
             }
             catch(Exception e){
                 e.printStackTrace();
             }
-
-            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-
-                @Override
-                public void onCompletion(MediaPlayer mplayer) {
-                    try {
-                        skipToNext();
-                    } catch (Exception e) {
-
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-            startPlayback();
         }
         else{
+            if(songBL.countAll() == 0 && mMediaPlayer != null){
+                mMediaPlayer.pause();
+                mMediaPlayer = null;
+            }
             sendResult(getString(R.string.pressRefresh));
         }
         buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE  ) );

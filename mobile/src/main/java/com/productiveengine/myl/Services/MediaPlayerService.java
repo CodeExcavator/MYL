@@ -17,7 +17,6 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import com.productiveengine.myl.BLL.CriteriaBL;
-import com.productiveengine.myl.BLL.SettingsBL;
 import com.productiveengine.myl.BLL.SongBL;
 import com.productiveengine.myl.Common.RequestCodes;
 import com.productiveengine.myl.DomainClasses.Song;

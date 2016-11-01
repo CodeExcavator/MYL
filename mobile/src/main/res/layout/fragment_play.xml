@@ -22,6 +22,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:enabled="false"
+                android:padding="0dp"
                 android:background="@color/lightGrey">
             </SeekBar>
 

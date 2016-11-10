@@ -1,0 +1,123 @@
+<layout>
+    <data>
+        <variable
+            name="statsVM"
+            type="com.productiveengine.myl.ViewModels.StatsVM"/>
+    </data>
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.productiveengine.myl.UIL.Stats">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="top"
+            android:layout_marginLeft="5dp">
+
+            <Button
+                style="@style/ButtonTextWhite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Refresh stats"
+                android:id="@+id/btnRefreshStats"
+                android:background="@drawable/black_button"
+                android:gravity="center"
+                />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Remaining :"
+                    android:id="@+id/lblRemainingSongs"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@{Integer.toString(statsVM.remainingSongs)}"
+                    android:id="@+id/lblRemainingSongsNum"
+                    />
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Processed :"
+                    android:id="@+id/lblProcessedSongs"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@{Integer.toString(statsVM.processedSongs)}"
+                    android:id="@+id/lblProcessedSongsNum"
+                    />
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Total :"
+                    android:id="@+id/lblTotalSongs"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@{Integer.toString(statsVM.totalSongs)}"
+                    android:id="@+id/lblTotalSongsNum"
+                    />
+            </LinearLayout>
+
+            <View android:id="@+id/divisor"
+                android:layout_height="2dp"
+                android:layout_width="fill_parent"
+                android:background="#ffffff" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Version :"
+                    android:id="@+id/lblVersion"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@={statsVM.version}"
+                    android:id="@+id/lblVersionNum"
+                    />
+            </LinearLayout>
+
+        </LinearLayout>
+    </FrameLayout>
+</layout>

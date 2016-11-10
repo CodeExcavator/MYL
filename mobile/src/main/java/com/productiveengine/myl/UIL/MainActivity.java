@@ -11,7 +11,6 @@ import android.graphics.PorterDuff;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -29,7 +28,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -37,32 +35,17 @@ import android.widget.Toast;
 
 import com.productiveengine.myl.BLL.CriteriaBL;
 import com.productiveengine.myl.Async.RefreshSongListTask;
-import com.productiveengine.myl.Common.HateCriteria;
-import com.productiveengine.myl.Common.InputFilterMinMax;
-import com.productiveengine.myl.Common.LoveCriteria;
-import com.productiveengine.myl.Common.RequestCodes;
-import com.productiveengine.myl.Common.Util;
+import com.productiveengine.myl.Common.*;
 import com.productiveengine.myl.Services.MediaPlayerService;
 import com.productiveengine.myl.UIL.databinding.FragmentPlayBinding;
 import com.productiveengine.myl.UIL.databinding.FragmentSettingsBinding;
-import com.productiveengine.myl.ViewModels.PlayVM;
-import com.productiveengine.myl.ViewModels.SettingsVM;
+import com.productiveengine.myl.UIL.databinding.FragmentStatsBinding;
+import com.productiveengine.myl.ViewModels.*;
 
 import java.io.File;
-
 import ar.com.daidalos.afiledialog.FileChooserActivity;
 
-import static com.productiveengine.myl.Common.RequestCodes.ACTION_NEXT;
-import static com.productiveengine.myl.Common.RequestCodes.ACTION_PAUSE;
-import static com.productiveengine.myl.Common.RequestCodes.ACTION_PLAY;
-import static com.productiveengine.myl.Common.RequestCodes.ACTION_PREVIOUS;
-import static com.productiveengine.myl.Common.RequestCodes.ACTION_STOP;
-import static com.productiveengine.myl.Common.RequestCodes.MEDIA_PLAYER_INFO;
-import static com.productiveengine.myl.Common.RequestCodes.MEDIA_PLAYER_MSG;
-import static com.productiveengine.myl.Common.RequestCodes.MEDIA_PLAYER_RESULT;
-import static com.productiveengine.myl.Common.RequestCodes.MP_CURRENT_POSITION;
-import static com.productiveengine.myl.Common.RequestCodes.MP_DURATION;
-import static com.productiveengine.myl.Common.RequestCodes.MP_NAME;
+import static com.productiveengine.myl.Common.RequestCodes.*;
 
 public class MainActivity extends AppCompatActivity implements AudioManager.OnAudioFocusChangeListener{
 
@@ -369,6 +352,9 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         FragmentPlayBinding fragmentPlayBinding;
         PlayVM playVM;
 
+        FragmentStatsBinding fragmentStatsBinding;
+        StatsVM statsVM;
+
         TextView txtLoveTimeLimit;
         TextView txtLoveTimePercentage;
         TextView txtHateTimeLimit;
@@ -385,7 +371,6 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         Button btnPlusLovePercentage;
 
         SeekBar musicSeekBar;
-        private final Handler handler = new Handler();
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -490,8 +475,6 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                 fragmentPlayBinding.setPlayVM(playVM);
                 rootView = fragmentPlayBinding.getRoot();
 
-                View settingsView = inflater.inflate(R.layout.fragment_settings, container, false);
-
                 Button btnRefreshSongList = (Button) rootView.findViewById(R.id.btnRefreshSongList);
                 btnRefreshSongList.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -547,6 +530,18 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                         return true;
                     }
                 });
+            }
+            else if(index == 2){
+                //-------------------------------------------------------------------------
+                //Stats fragment
+                //-------------------------------------------------------------------------
+                fragmentStatsBinding = FragmentStatsBinding.inflate(inflater, container, false);
+
+                statsVM = new StatsVM();
+                fragmentStatsBinding.setStatsVM(statsVM);
+                rootView = fragmentStatsBinding.getRoot();
+
+
             }
             return rootView;
         }

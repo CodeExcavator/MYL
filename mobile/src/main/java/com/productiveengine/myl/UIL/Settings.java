@@ -1,23 +1,7 @@
 package com.productiveengine.myl.UIL;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.preference.PreferenceFragment;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Toast;
-
-import com.productiveengine.myl.Common.RequestCodes;
-import com.productiveengine.myl.UIL.databinding.FragmentSettingsBinding;
-import com.productiveengine.myl.ViewModels.SettingsVM;
-
-import ar.com.daidalos.afiledialog.FileChooserActivity;
 
 public class Settings extends Fragment {
     private OnFragmentInteractionListener mListener;

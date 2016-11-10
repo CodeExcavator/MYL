@@ -1,7 +1,5 @@
 package com.productiveengine.myl.BLL;
 
-import android.util.Log;
-
 import com.activeandroid.query.Select;
 import com.productiveengine.myl.DomainClasses.Settings;
 

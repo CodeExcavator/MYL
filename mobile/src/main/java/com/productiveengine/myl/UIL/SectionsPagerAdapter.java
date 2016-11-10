@@ -23,7 +23,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -33,6 +33,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                 return "Settings";
             case 1:
                 return "Play";
+            case 2:
+                return "Stats";
         }
         return null;
     }

@@ -541,7 +541,13 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                 fragmentStatsBinding.setStatsVM(statsVM);
                 rootView = fragmentStatsBinding.getRoot();
 
-
+                Button btnRefreshStats = (Button) rootView.findViewById(R.id.btnRefreshStats);
+                btnRefreshStats.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onRefreshStats(v);
+                    }
+                });
             }
             return rootView;
         }
@@ -753,6 +759,11 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
             btnPlusHatePercentage.setEnabled(!value);
 
             settingsVM.setHateTimeLimitChk(value);
+        }
+
+        //Stats -------------------------------------------------------------------------------
+        public void onRefreshStats(View v){
+            statsVM.refreshStats();
         }
     }
 }

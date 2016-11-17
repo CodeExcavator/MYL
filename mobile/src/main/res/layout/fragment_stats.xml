@@ -27,6 +27,19 @@
                 android:gravity="center"
                 />
 
+            <View android:id="@+id/divisor1"
+                android:layout_height="2dp"
+                android:layout_width="fill_parent"
+                android:background="#ffffff" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Songs in playlist"
+                android:id="@+id/lblSongsInPlaylist"
+                />
+
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="wrap_content"
@@ -36,16 +49,38 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="Remaining :"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Remaining : "
                     android:id="@+id/lblRemainingSongs"
                     />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="@{Integer.toString(statsVM.remainingSongs)}"
                     android:id="@+id/lblRemainingSongsNum"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Loved : "
+                    android:id="@+id/lblLoved"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@{Integer.toString(statsVM.loved)}"
+                    android:id="@+id/lblLovedSongsNum"
                     />
             </LinearLayout>
             <LinearLayout
@@ -57,35 +92,81 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="Processed :"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Neutral : "
+                    android:id="@+id/lblneutral"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@{Integer.toString(statsVM.neutral)}"
+                    android:id="@+id/lblNeutralSongsNum"
+                    />
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Hated : "
+                    android:id="@+id/lblHated"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@{Integer.toString(statsVM.hated)}"
+                    android:id="@+id/lblHatedSongsNum"
+                    />
+            </LinearLayout>
+
+
+
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Processed : "
                     android:id="@+id/lblProcessedSongs"
                     />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="@{Integer.toString(statsVM.processedSongs)}"
                     android:id="@+id/lblProcessedSongsNum"
                     />
             </LinearLayout>
             <LinearLayout
                 android:orientation="horizontal"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="Total :"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Total     : "
                     android:id="@+id/lblTotalSongs"
                     />
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="@{Integer.toString(statsVM.totalSongs)}"
                     android:id="@+id/lblTotalSongsNum"
                     />
@@ -100,21 +181,23 @@
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="5dp">
+                android:layout_marginTop="5dp"
+                >
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="Version :"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Version    : "
                     android:id="@+id/lblVersion"
                     />
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="@={statsVM.version}"
                     android:id="@+id/lblVersionNum"
+
                     />
             </LinearLayout>
 

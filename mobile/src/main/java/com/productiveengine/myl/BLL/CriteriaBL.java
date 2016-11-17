@@ -4,9 +4,11 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.util.Log;
 
+import com.productiveengine.myl.Common.CriteriaEnum;
 import com.productiveengine.myl.Common.FileActions;
 import com.productiveengine.myl.Common.HateCriteria;
 import com.productiveengine.myl.Common.LoveCriteria;
+import com.productiveengine.myl.Common.SongStatusEnum;
 import com.productiveengine.myl.Common.Util;
 import com.productiveengine.myl.DomainClasses.Settings;
 
@@ -36,7 +38,7 @@ public class CriteriaBL {
             int currentPosition = Util.convertTrackTimeToSeconds(player.getCurrentPosition());
 
             File songFile = new File(currentSongPath);
-            //Delete from DB
+            //Delete from DB (logical delete)
             songBL.deleteByPath(currentSongPath);
             //--------------------------------------------------------------------------
             loadInMemoryCriteria();
@@ -64,11 +66,19 @@ public class CriteriaBL {
                     case TIME_LIMIT:
                         if (settings.loveTimeLimit < currentPosition) {
                             fileActions.moveFile(songFile.getParent(), songFile.getName(), settings.targetFolderPath);
+                            songBL.updateByPath(currentSongPath, SongStatusEnum.PROCESSED, CriteriaEnum.LOVE);
+                        }
+                        else{
+                            songBL.updateByPath(currentSongPath, SongStatusEnum.PROCESSED, CriteriaEnum.NEUTRAL);
                         }
                         break;
                     case PERCENTAGE:
                         if (settings.loveTimePercentage < completionPercentage) {
                             fileActions.moveFile(songFile.getParent(), songFile.getName(), settings.targetFolderPath);
+                            songBL.updateByPath(currentSongPath, SongStatusEnum.PROCESSED, CriteriaEnum.LOVE);
+                        }
+                        else{
+                            songBL.updateByPath(currentSongPath, SongStatusEnum.PROCESSED, CriteriaEnum.NEUTRAL);
                         }
                         break;
                 }

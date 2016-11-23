@@ -9,29 +9,28 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="com.productiveengine.myl.UIL.Stats">
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="top"
             android:layout_marginLeft="5dp">
-
-            <Button
-                style="@style/ButtonTextWhite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Refresh stats"
-                android:id="@+id/btnRefreshStats"
-                android:background="@drawable/black_button"
-                android:gravity="center"
-                />
-
+            <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                <Button
+                    style="@style/ButtonTextWhite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Refresh stats"
+                    android:id="@+id/btnRefreshStats"
+                    android:background="@drawable/black_button"
+                    android:gravity="center"
+                    android:layout_margin="10dp"
+                    />
+            </RelativeLayout>
             <View android:id="@+id/divisor1"
                 android:layout_height="2dp"
                 android:layout_width="fill_parent"
                 android:background="#ffffff" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -39,156 +38,157 @@
                 android:text="Songs in playlist"
                 android:id="@+id/lblSongsInPlaylist"
                 />
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp">
-
-                <TextView
+            <TableLayout
+                android:id="@+id/tableLayout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" >
+                <TableRow
+                    android:id="@+id/tableRow1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="Remaining : "
-                    android:id="@+id/lblRemainingSongs"
-                    />
-                <TextView
+                    android:padding="5dip" >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="Remaining : "
+                        android:id="@+id/lblRemainingSongs"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="@{Integer.toString(statsVM.remainingSongs)}"
+                        android:id="@+id/lblRemainingSongsNum"
+                        />
+                </TableRow>
+                <TableRow
+                    android:id="@+id/tableRow2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@{Integer.toString(statsVM.remainingSongs)}"
-                    android:id="@+id/lblRemainingSongsNum"
-                    />
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp">
-
-                <TextView
+                    android:padding="5dip" >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="Processed : "
+                        android:id="@+id/lblProcessedSongs"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="@{Integer.toString(statsVM.processedSongs)}"
+                        android:id="@+id/lblProcessedSongsNum"
+                        />
+                </TableRow>
+                    <TableRow
+                        android:id="@+id/tableRow3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dip" >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="Loved"
+                        android:textColor="@color/green"
+                        android:id="@+id/lblLoved"
+                        android:layout_marginLeft="10dp"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="@{Integer.toString(statsVM.loved)}"
+                        android:id="@+id/lblLovedSongsNum"
+                        android:textColor="@color/green"
+                        />
+               </TableRow>
+                <TableRow
+                    android:id="@+id/tableRow4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="Loved : "
-                    android:id="@+id/lblLoved"
-                    />
-                <TextView
+                    android:padding="5dip" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="Neutral"
+                        android:id="@+id/lblneutral"
+                        android:textColor="@color/yellow"
+                        android:layout_marginLeft="10dp"
+                        />
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:text="@{Integer.toString(statsVM.neutral)}"
+                            android:id="@+id/lblNeutralSongsNum"
+                        android:textColor="@color/yellow"
+                        />
+                </TableRow>
+                <TableRow
+                    android:id="@+id/tableRow5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@{Integer.toString(statsVM.loved)}"
-                    android:id="@+id/lblLovedSongsNum"
-                    />
-            </LinearLayout>
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp">
-
-                <TextView
+                    android:padding="5dip" >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="Hated"
+                        android:id="@+id/lblHated"
+                        android:textColor="@color/lightRed"
+                        android:layout_marginLeft="10dp"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="@{Integer.toString(statsVM.hated)}"
+                        android:id="@+id/lblHatedSongsNum"
+                        android:textColor="@color/lightRed"
+                        />
+                </TableRow>
+                <!-- -->
+                <TableRow
+                    android:id="@+id/tableRow6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="Neutral : "
-                    android:id="@+id/lblneutral"
-                    />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@{Integer.toString(statsVM.neutral)}"
-                    android:id="@+id/lblNeutralSongsNum"
-                    />
-            </LinearLayout>
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp">
+                    android:padding="5dip" >
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="Hated : "
-                    android:id="@+id/lblHated"
-                    />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@{Integer.toString(statsVM.hated)}"
-                    android:id="@+id/lblHatedSongsNum"
-                    />
-            </LinearLayout>
-
-
-
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="Processed : "
-                    android:id="@+id/lblProcessedSongs"
-                    />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@{Integer.toString(statsVM.processedSongs)}"
-                    android:id="@+id/lblProcessedSongsNum"
-                    />
-            </LinearLayout>
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="Total     : "
-                    android:id="@+id/lblTotalSongs"
-                    />
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@{Integer.toString(statsVM.totalSongs)}"
-                    android:id="@+id/lblTotalSongsNum"
-                    />
-            </LinearLayout>
-
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="Total songs : "
+                        android:id="@+id/lblTotalSongs"
+                        />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="@{Integer.toString(statsVM.totalSongs)}"
+                        android:id="@+id/lblTotalSongsNum"
+                        />
+                </TableRow>
+            </TableLayout>
             <View android:id="@+id/divisor"
                 android:layout_height="2dp"
                 android:layout_width="fill_parent"
                 android:background="#ffffff" />
-
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                >
-
+                android:layout_marginTop="5dp">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="Version    : "
+                    android:text="Version : "
                     android:id="@+id/lblVersion"
                     />
                 <TextView
@@ -197,10 +197,8 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="@={statsVM.version}"
                     android:id="@+id/lblVersionNum"
-
                     />
             </LinearLayout>
-
         </LinearLayout>
     </FrameLayout>
 </layout>

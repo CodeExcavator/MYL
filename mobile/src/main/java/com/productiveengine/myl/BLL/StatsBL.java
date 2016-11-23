@@ -12,7 +12,7 @@ public class StatsBL {
         int result = 0;
 
         try{
-            new Select()
+            result = new Select()
                     .from(Song.class)
                     .count();
         } catch(Exception e){

@@ -266,24 +266,25 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
     @Override
     protected void onStart() {
         super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(msgReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(infoReceiver);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        gainAudioFocus();
+
         LocalBroadcastManager.getInstance(this).registerReceiver((msgReceiver),
                 new IntentFilter(MEDIA_PLAYER_RESULT)
         );
         LocalBroadcastManager.getInstance(this).registerReceiver((infoReceiver),
                 new IntentFilter(MEDIA_PLAYER_INFO)
         );
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        //LocalBroadcastManager.getInstance(this).unregisterReceiver(msgReceiver);
-        //LocalBroadcastManager.getInstance(this).unregisterReceiver(infoReceiver);
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        gainAudioFocus();
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -12,7 +12,7 @@ import java.io.Serializable;
 
 public class StatsVM extends BaseObservable implements Serializable {
 
-    private String version = "a";
+    private String version = "1.4";
     private int remainingSongs;
     private int processedSongs;
     private int totalSongs;
@@ -78,7 +78,7 @@ public class StatsVM extends BaseObservable implements Serializable {
 
     public void setTotalSongs(int totalSongs) {
         this.totalSongs = totalSongs;
-        notifyPropertyChanged(BR.processedSongs);
+        notifyPropertyChanged(BR.totalSongs);
     }
 
     @Bindable

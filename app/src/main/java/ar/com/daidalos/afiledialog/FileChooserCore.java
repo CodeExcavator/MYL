@@ -608,8 +608,8 @@ class FileChooserCore {
 
 		// Get the file path.
 		if(folder == null || !folder.exists()) {
-			if(this.defaultFolder != null) {
-				this.currentFolder = this.defaultFolder;
+			if(defaultFolder != null) {
+				this.currentFolder = defaultFolder;
 			} else {
 				this.currentFolder = Environment.getExternalStorageDirectory();
 			}

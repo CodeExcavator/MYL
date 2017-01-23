@@ -1,17 +1,24 @@
 package com.productiveengine.myl.BLL;
 
+import android.util.Log;
+
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.activeandroid.query.Update;
 import com.productiveengine.myl.Common.CriteriaEnum;
+import com.productiveengine.myl.Common.FileActions;
+import com.productiveengine.myl.Common.HateCriteria;
 import com.productiveengine.myl.Common.SongStatusEnum;
 import com.productiveengine.myl.DomainClasses.Song;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.List;
 
 public class SongBL implements Serializable{
+
+    private static final String TAG = SongBL.class.getName();
 
     public Song fetchNextSong(){
 
@@ -68,6 +75,34 @@ public class SongBL implements Serializable{
                     .set("SongStatus = ?", sse.ordinal())
                     .where("Path = ?", path)
                     .execute();
+        }
+    }
+
+    public void deleteNeutralSongs(){
+
+        FileActions fileActions = new FileActions();
+        ActiveAndroid.beginTransaction();
+
+        try {
+            try {
+                List<Song> neutralSongs = new Select()
+                        .from(Song.class)
+                        .where("criteriaStatus = ?", CriteriaEnum.NEUTRAL.ordinal())
+                        .execute();
+
+                for (Song song : neutralSongs) {
+                    fileActions.deleteFile(song.path);
+                }
+                new Delete().from(Song.class).where("SongStatus = ?", CriteriaEnum.NEUTRAL).execute();
+
+                ActiveAndroid.setTransactionSuccessful();
+            } catch (Exception ex) {
+                Log.e(TAG, ex.getMessage());
+            } finally {
+                ActiveAndroid.endTransaction();
+            }
+        } catch (Exception ex) {
+            Log.e(TAG, ex.getMessage());
         }
     }
 

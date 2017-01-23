@@ -182,7 +182,7 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="5dp">
                 <TextView
                     android:layout_width="wrap_content"
@@ -199,6 +199,22 @@
                     android:id="@+id/lblVersionNum"
                     />
             </LinearLayout>
+            <View android:id="@+id/divisor2"
+                android:layout_height="2dp"
+                android:layout_width="fill_parent"
+                android:background="#ffffff" />
+
+            <Button
+                style="@style/ButtonTextWhite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delete Neutral Songs"
+                android:id="@+id/btnDeleteNeutralSongs"
+                android:background="@drawable/yellow_button"
+                android:gravity="center"
+                android:layout_margin="10dp"
+                />
+
         </LinearLayout>
     </FrameLayout>
 </layout>

@@ -80,6 +80,15 @@ public class FileActions {
             Log.e(TAG, e.getMessage());
         }
     }
+    public void deleteFile(String path) {
+        try {
+            // delete the original file
+            new File(path).delete();
+        }
+        catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
+    }
     public void copyFile(String inputPath, String inputFile, String outputPath) {
 
         InputStream in = null;

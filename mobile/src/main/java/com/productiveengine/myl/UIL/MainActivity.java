@@ -1,5 +1,6 @@
 package com.productiveengine.myl.UIL;
 
+import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -7,19 +8,27 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,6 +44,7 @@ import android.widget.Toast;
 
 import com.productiveengine.myl.BLL.CriteriaBL;
 import com.productiveengine.myl.Async.RefreshSongListTask;
+import com.productiveengine.myl.BLL.SongBL;
 import com.productiveengine.myl.Common.*;
 import com.productiveengine.myl.Services.MediaPlayerService;
 import com.productiveengine.myl.UIL.databinding.FragmentPlayBinding;
@@ -52,6 +62,11 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
     private AudioManager mAudioManager;
     BroadcastReceiver msgReceiver;
     BroadcastReceiver infoReceiver;
+    private static final int REQUEST_WRITE_STORAGE = 112;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -285,7 +300,56 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         LocalBroadcastManager.getInstance(this).registerReceiver((infoReceiver),
                 new IntentFilter(MEDIA_PLAYER_INFO)
         );
+
+        int permission = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Permission to access the SD-CARD is required for this app to access your music.")
+                        .setTitle("Permission required");
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int id) {
+                        makeRequest();
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+            } else {
+                makeRequest();
+            }
+
+        }
+
     }
+
+    protected void makeRequest() {
+        /*
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                REQUEST_WRITE_STORAGE);
+                */
+
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    this,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_WRITE_STORAGE
+            );
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -549,6 +613,14 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                         onRefreshStats(v);
                     }
                 });
+
+                Button btnDeleteNeutralSongs = (Button) rootView.findViewById(R.id.btnDeleteNeutralSongs);
+                btnDeleteNeutralSongs.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onDeleteNeutralSongs(v);
+                    }
+                });
             }
             return rootView;
         }
@@ -647,20 +719,36 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         }
         //Play -------------------------------------------------------------------------------
         public void onRefreshSongListClicked(View v){
-            MainActivity ma = (MainActivity) this.getActivity();
-            ma.informAudioService(ACTION_STOP);
 
-            CriteriaBL.loadInMemoryCriteria();
+            new AlertDialog.Builder(v.getContext())
+                    .setTitle("Confirm")
+                    .setMessage("Are you sure you want to refresh the song list ?")
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
 
-            if(!CriteriaBL.chkSettingsFolders()){
-                ma.openDialog(getString(R.string.setRootAndTarget));
-                return;
-            }
-            if(!CriteriaBL.chkSettingsHateLove()){
-                ma.openDialog(getString(R.string.setCriteria));
-                return;
-            }
-            AsyncTask task = new RefreshSongListTask(ma).execute();
+                            MainActivity ma = (MainActivity) getActivity();
+                            ma.informAudioService(ACTION_STOP);
+
+                            CriteriaBL.loadInMemoryCriteria();
+
+                            if(!CriteriaBL.chkSettingsFolders()){
+                                ma.openDialog(getString(R.string.setRootAndTarget));
+                                return;
+                            }
+                            if(!CriteriaBL.chkSettingsHateLove()){
+                                ma.openDialog(getString(R.string.setCriteria));
+                                return;
+                            }
+                            AsyncTask task = new RefreshSongListTask(ma).execute();
+
+                        } })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_info)
+                    .show();
         }
         public void onPlayClicked(View v){
             MainActivity ma = (MainActivity) this.getActivity();
@@ -684,7 +772,6 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         }
         //Settings -------------------------------------------------------------------------------
         public void onRootFolderClicked(View v){
-
             Intent intent = new Intent(this.getActivity(), FileChooserActivity.class);
             intent.putExtra(FileChooserActivity.INPUT_FOLDER_MODE, true);
             this.getActivity().startActivityForResult(intent, RequestCodes.CHOOSE_ROOT_FOLDER);
@@ -765,6 +852,24 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         //Stats -------------------------------------------------------------------------------
         public void onRefreshStats(View v){
             statsVM.refreshStats();
+        }
+        public void onDeleteNeutralSongs(View v){
+            new AlertDialog.Builder(v.getContext())
+                    .setTitle("Confirm")
+                    .setMessage("Are you sure you want to delete all the neutral songs ?")
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            new SongBL().deleteNeutralSongs();
+                            statsVM.refreshStats();
+                        } })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_info)
+                    .show();
         }
     }
 }

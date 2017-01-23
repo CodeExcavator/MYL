@@ -8,8 +8,8 @@ android {
         applicationId "com.productiveengine.myl"
         minSdkVersion 21
         targetSdkVersion 24
-        versionCode 5
-        versionName "1.4"
+        versionCode 6
+        versionName "1.5"
     }
     buildTypes {
         release {
@@ -35,8 +35,6 @@ repositories {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    //compile 'com.github.satyan:sugar:1.4'
-    
 
     testCompile 'junit:junit:4.12'
 

@@ -6,6 +6,7 @@ import android.databinding.Bindable;
 import com.productiveengine.myl.BLL.SettingsBL;
 import com.productiveengine.myl.Common.HateCriteria;
 import com.productiveengine.myl.Common.LoveCriteria;
+import com.productiveengine.myl.Common.Util;
 import com.productiveengine.myl.DomainClasses.Settings;
 import com.productiveengine.myl.UIL.BR;
 
@@ -15,7 +16,7 @@ public class SettingsVM  extends BaseObservable implements Serializable{
 
     private Settings settings;
     private String rootFolderPath;
-    private String targetFolderPath;
+    private String targetFolderPath = Util.targetPath;
     private String rootFolder;
     private String targetFolder;
     //--------------------------------------------
@@ -43,9 +44,7 @@ public class SettingsVM  extends BaseObservable implements Serializable{
 
         //----------------------------------------------
         rootFolderPath = settings.rootFolderPath;
-        targetFolderPath = settings.targetFolderPath;
         rootFolder = settings.rootFolder;
-        targetFolder = settings.targetFolder;
         //----------------------------------------------
         loveCriteria = LoveCriteria.fromInt(settings.loveCriteria);
 
@@ -85,9 +84,7 @@ public class SettingsVM  extends BaseObservable implements Serializable{
     private void notifyAndSave(int fieldId){
         //--------------------------------------------
         settings.rootFolderPath = rootFolderPath;
-        settings.targetFolderPath = targetFolderPath;
         settings.rootFolder = rootFolder;
-        settings.targetFolder = targetFolder;
         //--------------------------------------------
         if(hateCriteria != null) {
             settings.hateCriteria = hateCriteria.ordinal();
@@ -137,16 +134,6 @@ public class SettingsVM  extends BaseObservable implements Serializable{
     public void setRootFolder(String rootFolder) {
         this.rootFolder = rootFolder;
         notifyAndSave(BR.rootFolder);
-    }
-
-    @Bindable
-    public String getTargetFolder() {
-        return targetFolder;
-    }
-
-    public void setTargetFolder(String targetFolder) {
-        this.targetFolder = targetFolder;
-        notifyAndSave(BR.targetFolder);
     }
 
     @Bindable

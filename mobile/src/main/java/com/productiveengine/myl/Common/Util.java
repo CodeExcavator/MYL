@@ -1,8 +1,12 @@
 package com.productiveengine.myl.Common;
 
+import android.os.Environment;
+
 import java.util.concurrent.TimeUnit;
 
 public class Util {
+
+    public static final String targetPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).getAbsolutePath() +"/MYL target folder";
 
     public static int convertTrackTimeToSeconds(int duration){
         return (int) TimeUnit.MILLISECONDS.toMinutes(duration) * 60 +

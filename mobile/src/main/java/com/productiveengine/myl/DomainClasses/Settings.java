@@ -13,8 +13,6 @@ public class Settings extends Model{
     public String targetFolderPath;
     @Column(name = "RootFolder")
     public String rootFolder;
-    @Column(name = "TargetFolder")
-    public String targetFolder;
     //------------------------------
     @Column(name = "HateCriteria")
     public int hateCriteria;

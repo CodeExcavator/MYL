@@ -65,7 +65,7 @@ public class CriteriaBL {
                 switch (LoveCriteria.fromInt(settings.loveCriteria)) {
                     case TIME_LIMIT:
                         if (settings.loveTimeLimit < currentPosition) {
-                            fileActions.moveFile(songFile.getParent(), songFile.getName(), settings.targetFolderPath);
+                            fileActions.moveFile(songFile.getParent(), songFile.getName(), Util.targetPath);
                             songBL.updateByPath(currentSongPath, SongStatusEnum.PROCESSED, CriteriaEnum.LOVE);
                         }
                         else{
@@ -74,7 +74,7 @@ public class CriteriaBL {
                         break;
                     case PERCENTAGE:
                         if (settings.loveTimePercentage < completionPercentage) {
-                            fileActions.moveFile(songFile.getParent(), songFile.getName(), settings.targetFolderPath);
+                            fileActions.moveFile(songFile.getParent(), songFile.getName(), Util.targetPath);
                             songBL.updateByPath(currentSongPath, SongStatusEnum.PROCESSED, CriteriaEnum.LOVE);
                         }
                         else{

@@ -69,7 +69,6 @@ public class FileActions {
         catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
-
     }
     public void deleteFile(String inputPath, String inputFile) {
         try {

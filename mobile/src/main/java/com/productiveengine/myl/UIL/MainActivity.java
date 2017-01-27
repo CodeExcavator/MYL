@@ -13,6 +13,7 @@ import android.graphics.PorterDuff;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.TabLayout;
@@ -62,11 +63,16 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
     private AudioManager mAudioManager;
     BroadcastReceiver msgReceiver;
     BroadcastReceiver infoReceiver;
-    private static final int REQUEST_WRITE_STORAGE = 112;
+    private static final int REQUEST_EXTERNAL_STORAGE  = 1;
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
+
+    private boolean shouldAskPermission(){
+        return(Build.VERSION.SDK_INT> Build.VERSION_CODES.LOLLIPOP_MR1);
+    }
+
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -170,19 +176,6 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
 
         getSupportActionBar().hide();
 
-/*
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-        fab.setVisibility(View.GONE);
-        */
-        //Bind with background service -----------------------------------------------
-        //doBindService();
         msgReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -263,6 +256,25 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         };
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         gainAudioFocus();
+
+        if(shouldAskPermission()) {
+            verifyStoragePermissions(this);
+        }
+    }
+
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have read or write permission
+        int writePermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int readPermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        if (writePermission != PackageManager.PERMISSION_GRANTED || readPermission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
     }
 
     private void openDialog(String msg){
@@ -300,54 +312,6 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         LocalBroadcastManager.getInstance(this).registerReceiver((infoReceiver),
                 new IntentFilter(MEDIA_PLAYER_INFO)
         );
-
-        int permission = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("Permission to access the SD-CARD is required for this app to access your music.")
-                        .setTitle("Permission required");
-
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-                    public void onClick(DialogInterface dialog, int id) {
-                        makeRequest();
-                    }
-                });
-
-                AlertDialog dialog = builder.create();
-                dialog.show();
-
-            } else {
-                makeRequest();
-            }
-
-        }
-
-    }
-
-    protected void makeRequest() {
-        /*
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                REQUEST_WRITE_STORAGE);
-                */
-
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                    this,
-                    PERMISSIONS_STORAGE,
-                    REQUEST_WRITE_STORAGE
-            );
-        }
     }
 
     @Override
@@ -463,16 +427,6 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                     public void onClick(View v)
                     {
                         onRootFolderClicked(v);
-                    }
-                });
-
-                Button btnTargetFolder = (Button) rootView.findViewById(R.id.btnTargetFolder);
-                btnTargetFolder.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        onTargetFolderClicked(v);
                     }
                 });
                 //---------------------------------------------------------------------------------------
@@ -871,5 +825,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                     .setIcon(android.R.drawable.ic_dialog_info)
                     .show();
         }
+
+
     }
 }

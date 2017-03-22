@@ -10,9 +10,11 @@ import com.productiveengine.myl.Common.HateCriteria;
 import com.productiveengine.myl.Common.LoveCriteria;
 import com.productiveengine.myl.Common.SongStatusEnum;
 import com.productiveengine.myl.Common.Util;
+import com.productiveengine.myl.DomainClasses.ErrorLog;
 import com.productiveengine.myl.DomainClasses.Settings;
 
 import java.io.File;
+import java.util.List;
 
 public class CriteriaBL {
 
@@ -42,6 +44,17 @@ public class CriteriaBL {
             songBL.deleteByPath(currentSongPath);
             //--------------------------------------------------------------------------
             loadInMemoryCriteria();
+
+            //TEST
+            if(currentPosition < 1){
+
+                //ErrorLogBL errorLogBL = new ErrorLogBL();
+                //ErrorLog er = new ErrorLog("TEST");
+               //er.save();
+               // List<ErrorLog> errorLogs = errorLogBL.getAll();
+
+                throw new RuntimeException("duration "+duration+ " ");
+            }
 
             double completionPercentage = (((double) currentPosition) / duration) * 100;
 

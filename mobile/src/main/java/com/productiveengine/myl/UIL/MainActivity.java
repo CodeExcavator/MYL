@@ -304,6 +304,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
     @Override
     protected void onResume() {
         super.onResume();
+
         gainAudioFocus();
 
         LocalBroadcastManager.getInstance(this).registerReceiver((msgReceiver),
@@ -312,6 +313,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         LocalBroadcastManager.getInstance(this).registerReceiver((infoReceiver),
                 new IntentFilter(MEDIA_PLAYER_INFO)
         );
+
     }
 
     @Override

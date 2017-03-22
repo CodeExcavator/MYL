@@ -17,8 +17,10 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import com.productiveengine.myl.BLL.CriteriaBL;
+import com.productiveengine.myl.BLL.ErrorLogBL;
 import com.productiveengine.myl.BLL.SongBL;
 import com.productiveengine.myl.Common.RequestCodes;
+import com.productiveengine.myl.DomainClasses.ErrorLog;
 import com.productiveengine.myl.DomainClasses.Song;
 import com.productiveengine.myl.UIL.R;
 import java.io.File;
@@ -50,6 +52,8 @@ public class MediaPlayerService extends Service {
     private SongBL songBL;
     private String currentSongPath;
     private String currentSongName;
+
+    private ErrorLogBL errorLogBL = new ErrorLogBL();
 
     LocalBroadcastManager broadcaster;
 
@@ -267,6 +271,8 @@ public class MediaPlayerService extends Service {
 
             if(mMediaPlayer != null && mMediaPlayer.isPlaying()){
                 mMediaPlayer.stop();
+                mMediaPlayer.release();
+                mMediaPlayer = null;
             }
 
             mMediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(currentSongPath));
@@ -283,7 +289,7 @@ public class MediaPlayerService extends Service {
                         try {
                             skipToNext();
                         } catch (Exception e) {
-
+                            //errorLogBL.save(e);
                             e.printStackTrace();
                         }
                     }

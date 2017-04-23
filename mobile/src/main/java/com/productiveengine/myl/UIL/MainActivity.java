@@ -810,6 +810,9 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
             statsVM.refreshStats();
         }
         public void onDeleteNeutralSongs(View v){
+
+            new SongBL().printSongs(Util.targetPath);
+            /*
             new AlertDialog.Builder(v.getContext())
                     .setTitle("Confirm")
                     .setMessage("Are you sure you want to delete all the neutral songs ?")
@@ -826,6 +829,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                     })
                     .setIcon(android.R.drawable.ic_dialog_info)
                     .show();
+                    */
         }
 
 

@@ -46,15 +46,15 @@ public class CriteriaBL {
             loadInMemoryCriteria();
 
             //TEST
-            if(currentPosition < 1){
+            //if(currentPosition < 1){
 
                 //ErrorLogBL errorLogBL = new ErrorLogBL();
                 //ErrorLog er = new ErrorLog("TEST");
                //er.save();
                // List<ErrorLog> errorLogs = errorLogBL.getAll();
 
-                throw new RuntimeException("duration "+duration+ " ");
-            }
+                //throw new RuntimeException("duration "+duration+ " ");
+            //}
 
             double completionPercentage = (((double) currentPosition) / duration) * 100;
 

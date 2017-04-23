@@ -208,11 +208,11 @@
                 style="@style/ButtonTextWhite"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Delete Neutral Songs"
+                android:text="Print Neutral and Hated Songs"
                 android:id="@+id/btnDeleteNeutralSongs"
                 android:background="@drawable/yellow_button"
                 android:gravity="center"
-                android:layout_margin="10dp"
+                android:layout_margin="5dp"
                 />
 
         </LinearLayout>

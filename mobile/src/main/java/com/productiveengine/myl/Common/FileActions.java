@@ -2,6 +2,7 @@ package com.productiveengine.myl.Common;
 
 import android.util.Log;
 
+import com.productiveengine.myl.DomainClasses.Song;
 import com.productiveengine.myl.Services.MediaPlayerService;
 
 import java.io.File;
@@ -10,6 +11,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.List;
 
 public class FileActions {
 
@@ -191,5 +194,22 @@ public class FileActions {
         }
 
         return outputPath;
+    }
+    public void printSongs(String path, List<Song> songs){
+
+        OutputStream out = null;
+
+        try {
+            deleteFile(path + "/songs.txt");
+            PrintWriter writer = new PrintWriter(path + "/songs.txt", "UTF-8");
+
+            for (int i=0; i < songs.size(); i++) {
+                writer.println(songs.get(i).path);
+            }
+            writer.close();
+        }
+        catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
     }
 }

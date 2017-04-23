@@ -31,6 +31,18 @@ public class SongBL implements Serializable{
         return song;
     }
 
+    public List<Song> selectWithCriteria(){
+
+        return new Select()
+                .from(Song.class)
+                .where("SongStatus = ? AND criteriaStatus in (?,?)",
+                        SongStatusEnum.PROCESSED.ordinal(),
+                        CriteriaEnum.HATE.ordinal(),
+                        CriteriaEnum.NEUTRAL.ordinal())
+                .orderBy("RANDOM()")
+                .execute();
+    }
+
     public void saveAll(List<Song> songList){
 
         ActiveAndroid.beginTransaction();
@@ -129,5 +141,11 @@ public class SongBL implements Serializable{
         finally {
             ActiveAndroid.endTransaction();
         }
+    }
+
+    public void printSongs(String path){
+        FileActions fileActions = new FileActions();
+
+        fileActions.printSongs(path, selectWithCriteria());
     }
 }

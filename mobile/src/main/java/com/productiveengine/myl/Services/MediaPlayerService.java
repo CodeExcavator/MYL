@@ -359,8 +359,15 @@ public class MediaPlayerService extends Service {
         Intent intent = new Intent(MEDIA_PLAYER_INFO);
 
         intent.putExtra(MP_NAME, currentSongName );
-        intent.putExtra(MP_DURATION, mMediaPlayer.getDuration() + "");
-        intent.putExtra(MP_CURRENT_POSITION, mMediaPlayer.getCurrentPosition() + "");
+
+        if(mMediaPlayer != null) {
+            try {
+                intent.putExtra(MP_DURATION, mMediaPlayer.getDuration() + "");
+                intent.putExtra(MP_CURRENT_POSITION, mMediaPlayer.getCurrentPosition() + "");
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
 
         broadcaster.sendBroadcast(intent);
     }

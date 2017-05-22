@@ -295,6 +295,7 @@ public class MediaPlayerService extends Service {
                     }
                 });
 
+                updateUI();
                 startPlayback();
             }
             catch(Exception e){
@@ -343,7 +344,6 @@ public class MediaPlayerService extends Service {
         }
         return true;
     }
-
     private void startPlayback(){
         CriteriaBL.loadInMemoryCriteria();
 
@@ -354,7 +354,6 @@ public class MediaPlayerService extends Service {
     public void sendResult(String msg){
         RequestCodes.broadcastInfo(broadcaster, MEDIA_PLAYER_RESULT , MEDIA_PLAYER_MSG, msg);
     }
-
     public void updateUI() {
         Intent intent = new Intent(MEDIA_PLAYER_INFO);
 

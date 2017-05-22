@@ -213,6 +213,7 @@
                 android:background="@drawable/yellow_button"
                 android:gravity="center"
                 android:layout_margin="5dp"
+                android:visibility="invisible"
                 />
 
         </LinearLayout>

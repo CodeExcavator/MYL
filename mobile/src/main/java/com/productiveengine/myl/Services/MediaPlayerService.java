@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.Rating;
@@ -240,10 +241,16 @@ public class MediaPlayerService extends Service {
         buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE ) );
     }
     private void pause(){
-        if(mMediaPlayer != null) {
-            mMediaPlayer.pause();
+
+        AudioManager audio=(AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        if(audio.isWiredHeadsetOn()){
+            skipToNext();
+        }else{
+            if(mMediaPlayer != null) {
+                mMediaPlayer.pause();
+            }
+            buildNotification(generateAction(android.R.drawable.ic_media_play, "Play", ACTION_PLAY));
         }
-        buildNotification(generateAction(android.R.drawable.ic_media_play, "Play", ACTION_PLAY));
     }
     private void stop(){
 

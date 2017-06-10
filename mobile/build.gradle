@@ -8,8 +8,8 @@ android {
         applicationId "com.productiveengine.myl"
         minSdkVersion 21
         targetSdkVersion 24
-        versionCode 7
-        versionName "1.6"
+        versionCode 8
+        versionName "1.7"
     }
     buildTypes {
         release {
@@ -25,6 +25,10 @@ android {
 
     dataBinding {
         enabled = true
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
     }
 }
 

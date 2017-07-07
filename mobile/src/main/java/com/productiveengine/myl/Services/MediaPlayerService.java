@@ -306,6 +306,9 @@ public class MediaPlayerService extends Service {
                 startPlayback();
             }
             catch(Exception e){
+                if(currentSongPath != null){
+                    songBL.deleteByPath(currentSongPath);
+                }
                 e.printStackTrace();
             }
         }

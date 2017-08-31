@@ -16,7 +16,7 @@ public class SettingsVM  extends BaseObservable implements Serializable{
 
     private Settings settings;
     private String rootFolderPath;
-    private String targetFolderPath = Util.targetPath;
+    private String targetFolderPath;
     private String rootFolder;
     private String targetFolder;
     //--------------------------------------------
@@ -45,6 +45,12 @@ public class SettingsVM  extends BaseObservable implements Serializable{
         //----------------------------------------------
         rootFolderPath = settings.rootFolderPath;
         rootFolder = settings.rootFolder;
+
+        targetFolderPath = settings.targetFolderPath;
+
+        if(targetFolderPath == null){
+            setTargetFolderPath(Util.targetPath);
+        }
         //----------------------------------------------
         loveCriteria = LoveCriteria.fromInt(settings.loveCriteria);
 
@@ -85,6 +91,8 @@ public class SettingsVM  extends BaseObservable implements Serializable{
         //--------------------------------------------
         settings.rootFolderPath = rootFolderPath;
         settings.rootFolder = rootFolder;
+
+        settings.targetFolderPath = targetFolderPath;
         //--------------------------------------------
         if(hateCriteria != null) {
             settings.hateCriteria = hateCriteria.ordinal();

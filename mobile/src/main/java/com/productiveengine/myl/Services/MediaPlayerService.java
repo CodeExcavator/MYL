@@ -313,7 +313,7 @@ public class MediaPlayerService extends Service {
             }
         }
         else{
-            if(songBL.countAll() == 0 && mMediaPlayer != null){
+            if(songBL.countAvailable() == 0 && mMediaPlayer != null){
                 mMediaPlayer.pause();
                 mMediaPlayer = null;
             }

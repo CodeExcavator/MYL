@@ -15,6 +15,7 @@ import com.productiveengine.myl.DomainClasses.Song;
 import java.io.File;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Random;
 
 public class SongBL implements Serializable{
 
@@ -22,12 +23,21 @@ public class SongBL implements Serializable{
 
     public Song fetchNextSong(){
 
+        int min = 0;
+        int max = countAvailable();
+
+        if(max == 0 ){ return null; }
+
+        Random r = new Random();
+        int nthSong = r.nextInt(max - min) + min;
+
+        if(max == 1 ){ nthSong = 0; }
+
         Song song = new Select()
                         .from(Song.class)
                         .where("SongStatus = ?", SongStatusEnum.NEW.ordinal())
-                        .orderBy("RANDOM()")
+                        .limit(1).offset(nthSong)
                         .executeSingle();
-
         return song;
     }
 
@@ -127,6 +137,13 @@ public class SongBL implements Serializable{
     public int countAll() {
         return new Select()
                 .from(Song.class)
+                .count();
+    }
+
+    public int countAvailable(){
+        return new Select()
+                .from(Song.class)
+                .where("SongStatus = ?", SongStatusEnum.NEW.ordinal())
                 .count();
     }
 

@@ -51,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@{settingsVM.rootFolderPath}"
+                android:text="@={settingsVM.rootFolderPath}"
                 android:id="@+id/lblRootFolderPath"
                 android:textColor="@color/green"/>
 
@@ -72,7 +72,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@{settingsVM.targetFolderPath}"
+                android:text="@={settingsVM.targetFolderPath}"
                 android:id="@+id/lblTargetFolderPath"
                 android:textColor="@color/green"/>
 
@@ -253,7 +253,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/loveTimePercentage"
-                    android:checked="@{!settingsVM.loveTimeLimitChk}"
+                    android:checked="@={!settingsVM.loveTimeLimitChk}"
                     />
                 <LinearLayout
                     android:layout_width="match_parent"

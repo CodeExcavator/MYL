@@ -28,19 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
-import static com.productiveengine.myl.Common.RequestCodes.MEDIA_PLAYER_INFO;
-import static com.productiveengine.myl.Common.RequestCodes.MEDIA_PLAYER_MSG;
-import static com.productiveengine.myl.Common.RequestCodes.MEDIA_PLAYER_RESULT;
-import static com.productiveengine.myl.Common.RequestCodes.MP_CURRENT_POSITION;
-import static com.productiveengine.myl.Common.RequestCodes.MP_DURATION;
-import static com.productiveengine.myl.Common.RequestCodes.MP_NAME;
-import static com.productiveengine.myl.Common.RequestCodes.ACTION_FAST_FORWARD;
-import static com.productiveengine.myl.Common.RequestCodes.ACTION_NEXT;
-import static com.productiveengine.myl.Common.RequestCodes.ACTION_PAUSE;
-import static com.productiveengine.myl.Common.RequestCodes.ACTION_PLAY;
-import static com.productiveengine.myl.Common.RequestCodes.ACTION_PREVIOUS;
-import static com.productiveengine.myl.Common.RequestCodes.ACTION_REWIND;
-import static com.productiveengine.myl.Common.RequestCodes.ACTION_STOP;
+import static com.productiveengine.myl.Common.RequestCodes.*;
 
 public class MediaPlayerService extends Service {
 
@@ -92,6 +80,10 @@ public class MediaPlayerService extends Service {
             mController.getTransportControls().skipToNext();
         } else if( action.equalsIgnoreCase( ACTION_STOP ) ) {
             mController.getTransportControls().stop();
+        }else if( action.equalsIgnoreCase( ACTION_INSTANT_HATE ) ) {
+            instantHate();
+        }else if( action.equalsIgnoreCase( ACTION_INSTANT_LOVE ) ) {
+            instantLove();
         }
     }
 
@@ -136,7 +128,6 @@ public class MediaPlayerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
         initMediaSessions();
         handleIntent( intent );
         return super.onStartCommand(intent, flags, startId);
@@ -162,10 +153,7 @@ public class MediaPlayerService extends Service {
                 .setState(PlaybackState.STATE_PLAYING, 0, 1, SystemClock.elapsedRealtime())
                 .build();
         mSession.setPlaybackState(state);
-
         mController = new MediaController(getApplicationContext(), mSession.getSessionToken());
-
-
         mSession.setCallback(new MediaSession.Callback(){
             @Override
             public boolean onMediaButtonEvent(final Intent mediaButtonIntent) {
@@ -223,6 +211,7 @@ public class MediaPlayerService extends Service {
              public void onSetRating(Rating rating) {
                  super.onSetRating(rating);
              }
+
          }
         );
     }
@@ -271,7 +260,30 @@ public class MediaPlayerService extends Service {
             CriteriaBL.applyCriteriaDB(mMediaPlayer, currentSongPath);
         }
         Song song = songBL.fetchNextSong();
+        prepareNextSong(song);
+        buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE  ) );
+    }
+    private void instantHate(){
 
+        if(currentSongPath == null){
+            return;
+        }
+        CriteriaBL.instantHate(currentSongPath);
+
+        Song song = songBL.fetchNextSong();
+        prepareNextSong(song);
+    }
+    private void instantLove(){
+
+        if(currentSongPath == null){
+            return;
+        }
+        CriteriaBL.instantLove(currentSongPath);
+
+        Song song = songBL.fetchNextSong();
+        prepareNextSong(song);
+    }
+    private void prepareNextSong(Song song){
         if(song != null && song.name != null && song.name.trim().length() > 0){
             currentSongPath = song.path;
             currentSongName = song.name;
@@ -281,14 +293,11 @@ public class MediaPlayerService extends Service {
                 mMediaPlayer.release();
                 mMediaPlayer = null;
             }
-
             mMediaPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(currentSongPath));
-
             mmr = new MediaMetadataRetriever();
 
             try {
                 mmr.setDataSource(getApplicationContext(), Uri.parse(currentSongPath));
-
                 mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
                     @Override
@@ -301,7 +310,6 @@ public class MediaPlayerService extends Service {
                         }
                     }
                 });
-
                 updateUI();
                 startPlayback();
             }
@@ -319,8 +327,8 @@ public class MediaPlayerService extends Service {
             }
             sendResult(getString(R.string.pressRefresh));
         }
-        buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE  ) );
     }
+
     private void skipToPrevious(){
 
         if(mMediaPlayer != null) {

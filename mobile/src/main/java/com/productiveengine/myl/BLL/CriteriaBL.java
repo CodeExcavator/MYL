@@ -64,12 +64,14 @@ public class CriteriaBL {
                     if (settings.hateTimeLimit > currentPosition) {
                         fileActions.deleteFile(songFile.getParent(), songFile.getName());
                         songDeleted = true;
+                        songBL.updateByPath(currentSongPath, SongStatusEnum.PROCESSED, CriteriaEnum.HATE);
                     }
                     break;
                 case PERCENTAGE:
                     if (settings.hateTimePercentage > completionPercentage) {
                         fileActions.deleteFile(songFile.getParent(), songFile.getName());
                         songDeleted = true;
+                        songBL.updateByPath(currentSongPath, SongStatusEnum.PROCESSED, CriteriaEnum.HATE);
                     }
                     break;
             }
@@ -103,7 +105,42 @@ public class CriteriaBL {
         }
         return ok;
     }
+    public static boolean instantHate(String currentSongPath){
+        boolean ok = false;
 
+        try {
+            FileActions fileActions = new FileActions();
+            File songFile = new File(currentSongPath);
+            fileActions.deleteFile(songFile.getParent(), songFile.getName());
+
+            SongBL songBL = new SongBL();
+            songBL.updateByPath(currentSongPath, SongStatusEnum.PROCESSED, CriteriaEnum.HATE);
+
+            ok = true;
+        }catch (Exception ex){
+            Log.e(TAG,ex.getMessage());
+        }
+
+        return ok;
+    }
+    public static boolean instantLove(String currentSongPath){
+        boolean ok = false;
+
+        try {
+            FileActions fileActions = new FileActions();
+            File songFile = new File(currentSongPath);
+            fileActions.moveFile(songFile.getParent(), songFile.getName(), Util.targetPath);
+
+            SongBL songBL = new SongBL();
+            songBL.updateByPath(currentSongPath, SongStatusEnum.PROCESSED, CriteriaEnum.LOVE);
+
+            ok = true;
+        }catch (Exception ex){
+            Log.e(TAG,ex.getMessage());
+        }
+
+        return ok;
+    }
     public static void loadInMemoryCriteria(){
         //Get settings from DB
         //(keep staticly in memory for UI access)

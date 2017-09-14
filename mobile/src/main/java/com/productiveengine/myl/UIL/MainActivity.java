@@ -199,8 +199,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
 
                 TextView txtCurrentSong = (TextView) findViewById(R.id.txtCurrentSong);
 
-                if(txtCurrentSong != null)
-                {
+                if(txtCurrentSong != null) {
                     txtCurrentSong.setText(songName);
                 }
 
@@ -533,6 +532,24 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                         onReplayClicked(v);
                     }
                 });
+                Button btnInstantHate = (Button) rootView.findViewById(R.id.btnInstantHate);
+                btnInstantHate.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        onInstantHateClicked(v);
+                    }
+                });
+                Button btnInstantLove = (Button) rootView.findViewById(R.id.btnInstantLove);
+                btnInstantLove.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        onInstantLoveClicked(v);
+                    }
+                });
                 Button btnNext = (Button) rootView.findViewById(R.id.btnNext);
                 btnNext.setOnClickListener(new View.OnClickListener()
                 {
@@ -725,6 +742,16 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
             MainActivity ma = (MainActivity) this.getActivity();
             CriteriaBL.loadInMemoryCriteria();
             ma.informAudioService(ACTION_NEXT);
+        }
+
+        //Instant --------------------------------------------------------------------------------
+        public void onInstantHateClicked(View v){
+            MainActivity ma = (MainActivity) this.getActivity();
+            ma.informAudioService(ACTION_INSTANT_HATE);
+        }
+        public void onInstantLoveClicked(View v){
+            MainActivity ma = (MainActivity) this.getActivity();
+            ma.informAudioService(ACTION_INSTANT_LOVE);
         }
         //Settings -------------------------------------------------------------------------------
         public void onRootFolderClicked(View v){

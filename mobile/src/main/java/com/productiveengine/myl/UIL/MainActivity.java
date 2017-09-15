@@ -36,12 +36,15 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.productiveengine.myl.BLL.CriteriaBL;
 import com.productiveengine.myl.Async.RefreshSongListTask;
@@ -399,6 +402,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         Button btnMinusLovePercentage;
         Button btnPlusLoveTime;
         Button btnPlusLovePercentage;
+        ToggleButton toggBtnScreeonOn;
 
         SeekBar musicSeekBar;
 
@@ -685,7 +689,15 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                     }
                 }
             });
-
+            toggBtnScreeonOn = (ToggleButton) rootView.findViewById(R.id.toggBtnScreeonOn);
+            toggBtnScreeonOn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    settingsVM.setScreenOn(isChecked);
+                    buttonView.setKeepScreenOn(isChecked);
+                }
+            });
+            toggBtnScreeonOn.setChecked(settingsVM.isScreenOn());
+            rootView.setKeepScreenOn(settingsVM.isScreenOn());
             //-------------------------------------
             toggleHateCriteria(settingsVM.isHateTimeLimitChk());
             toggleLoveCriteria(settingsVM.isLoveTimeLimitChk());

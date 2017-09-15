@@ -212,7 +212,6 @@
                     android:text= "@string/loveTimeLimit"
                     android:checked="@={settingsVM.loveTimeLimitChk}"
                     />
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -227,7 +226,6 @@
                         android:id="@+id/btnMinusLoveTime"
                         android:background="@drawable/blue_button"
                         />
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -238,7 +236,6 @@
                         android:gravity="center"
                         android:textAlignment="gravity"
                         />
-
                     <Button
                         style="?android:attr/buttonStyleSmall"
                         android:layout_width="wrap_content"
@@ -288,6 +285,25 @@
                         />
                 </LinearLayout>
             </RadioGroup>
+            <View android:id="@+id/toggleDivisor"
+                android:layout_height="2dp"
+                android:layout_width="fill_parent"
+                android:background="#ffffff" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+                <ToggleButton
+                    android:id="@+id/toggBtnScreeonOn"
+                    android:layout_below="@+id/text6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textOn="Screen Always On"
+                    android:textOff="Screen Sleeps"
+                    android:gravity="center"
+                    />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 </FrameLayout>

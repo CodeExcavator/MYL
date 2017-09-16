@@ -554,6 +554,15 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                         onInstantLoveClicked(v);
                     }
                 });
+                Button btnGo40 = (Button) rootView.findViewById(R.id.btnGo40);
+                btnGo40.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        onGo40Clicked(v);
+                    }
+                });
                 Button btnNext = (Button) rootView.findViewById(R.id.btnNext);
                 btnNext.setOnClickListener(new View.OnClickListener()
                 {
@@ -764,6 +773,10 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         public void onInstantLoveClicked(View v){
             MainActivity ma = (MainActivity) this.getActivity();
             ma.informAudioService(ACTION_INSTANT_LOVE);
+        }
+        public void onGo40Clicked(View v){
+            MainActivity ma = (MainActivity) this.getActivity();
+            ma.informAudioService(ACTION_GO40);
         }
         //Settings -------------------------------------------------------------------------------
         public void onRootFolderClicked(View v){

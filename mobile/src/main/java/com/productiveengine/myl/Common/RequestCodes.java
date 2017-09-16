@@ -16,6 +16,7 @@ public class RequestCodes {
     public static final String ACTION_STOP = "action_stop";
     public static final String ACTION_INSTANT_LOVE = "action_instant_love";
     public static final String ACTION_INSTANT_HATE = "action_instant_hate";
+    public static final String ACTION_GO40 = "action_go40";
 
     static final public String MEDIA_PLAYER_RESULT = "com.productiveengine.myl.Services.MediaPlayerService.MEDIA_PLAYER_RESULT";
     static final public String MEDIA_PLAYER_MSG = "com.productiveengine.myl.Services.MediaPlayerService.MEDIA_PLAYER_MSG";

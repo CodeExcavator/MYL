@@ -14,6 +14,7 @@ import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
@@ -21,6 +22,7 @@ import com.productiveengine.myl.BLL.CriteriaBL;
 import com.productiveengine.myl.BLL.ErrorLogBL;
 import com.productiveengine.myl.BLL.SongBL;
 import com.productiveengine.myl.Common.RequestCodes;
+import com.productiveengine.myl.Common.Util;
 import com.productiveengine.myl.DomainClasses.ErrorLog;
 import com.productiveengine.myl.DomainClasses.Song;
 import com.productiveengine.myl.UIL.R;
@@ -46,7 +48,7 @@ public class MediaPlayerService extends Service {
 
     LocalBroadcastManager broadcaster;
 
-    final Timer timer = new Timer();
+    Timer timer = new Timer();
 
     @Override
     public void onCreate() {
@@ -84,6 +86,8 @@ public class MediaPlayerService extends Service {
             instantHate();
         }else if( action.equalsIgnoreCase( ACTION_INSTANT_LOVE ) ) {
             instantLove();
+        }else if( action.equalsIgnoreCase( ACTION_GO40 ) ) {
+            go40();
         }
     }
 
@@ -283,6 +287,21 @@ public class MediaPlayerService extends Service {
         Song song = songBL.fetchNextSong();
         prepareNextSong(song);
     }
+    private void go40(){
+
+        if(mMediaPlayer != null){
+            int duration = Util.convertTrackTimeToSeconds(mMediaPlayer.getDuration());
+            int currentPosition = Util.convertTrackTimeToSeconds(mMediaPlayer.getCurrentPosition());
+
+            double completionPercentage = (((double) currentPosition) / duration) * 100;
+
+            if(completionPercentage < 40){
+                long seekToPosition = Math.round(mMediaPlayer.getDuration() * 0.4);
+                mMediaPlayer.seekTo((int)seekToPosition);
+            }
+        }
+
+    }
     private void prepareNextSong(Song song){
         if(song != null && song.name != null && song.name.trim().length() > 0){
             currentSongPath = song.path;
@@ -328,7 +347,6 @@ public class MediaPlayerService extends Service {
             sendResult(getString(R.string.pressRefresh));
         }
     }
-
     private void skipToPrevious(){
 
         if(mMediaPlayer != null) {
@@ -389,21 +407,27 @@ public class MediaPlayerService extends Service {
         broadcaster.sendBroadcast(intent);
     }
 
-    public void timerFunction(){
+    public void timerFunction() {
+        final Handler handler = new Handler();
 
-        timer.purge();
-
-        timer.scheduleAtFixedRate(new TimerTask() {
+        TimerTask timertask = new TimerTask() {
             @Override
             public void run() {
-                if (mMediaPlayer != null) {
-                    updateUI();
-                } else {
-                    timer.cancel();
-                    timer.purge();
-                }
+                handler.post(new Runnable() {
+                    public void run() {
+                        try {
+                            if (mMediaPlayer != null) {
+                                updateUI();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
             }
-        }, 0, 1000);
+        };
+        timer = new Timer(); //This is new
+        timer.schedule(timertask, 0, 1000); // execute in every 15sec
     }
     //endregion
 }

@@ -146,7 +146,6 @@ public class CriteriaBL {
         //(keep staticly in memory for UI access)
         settings = settingsBL.initializeSettingsFromDB();
     }
-
     public static int applyCriteriaInMemory_SeekbarColor(int currentPosition, double percentage ){
         int color;
 
@@ -185,14 +184,12 @@ public class CriteriaBL {
         }
         return color;
     }
-
     public static boolean chkSettingsFolders(){
 
         return !(CriteriaBL.settings == null ||
                 CriteriaBL.settings.targetFolderPath == null ||
                 CriteriaBL.settings.rootFolderPath == null);
     }
-
     public static boolean chkSettingsHateLove(){
 
         return !(CriteriaBL.settings == null ||

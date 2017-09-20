@@ -86,7 +86,7 @@
                     android:background="@drawable/black_button"
                     style="@style/ButtonTextWhite"
                     android:layout_marginTop="5dp"
-                    android:layout_weight="0.1" />
+                     />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

@@ -12,7 +12,7 @@ import java.io.Serializable;
 
 public class StatsVM extends BaseObservable implements Serializable {
 
-    private String version = "1.10";
+    private String version = "1.11";
     private int remainingSongs;
     private int processedSongs;
     private int totalSongs;

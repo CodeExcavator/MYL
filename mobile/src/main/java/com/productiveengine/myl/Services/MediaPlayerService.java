@@ -1,23 +1,33 @@
 package com.productiveengine.myl.Services;
 
+import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
+import android.media.MediaMetadata;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.Rating;
+import android.media.RemoteControlClient;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
+
 import com.productiveengine.myl.BLL.CriteriaBL;
 import com.productiveengine.myl.BLL.ErrorLogBL;
 import com.productiveengine.myl.BLL.SongBL;
@@ -35,11 +45,14 @@ import static com.productiveengine.myl.Common.RequestCodes.*;
 public class MediaPlayerService extends Service {
 
     private static final String TAG = MediaPlayerService.class.getName();
+    private static final String AVRCP_PLAYSTATE_CHANGED = "com.android.music.playstatechanged";
+    private static final String AVRCP_META_CHANGED = "com.android.music.metachanged";
 
     private MediaPlayer mMediaPlayer;
     private MediaSession mSession;
     private MediaController mController;
     private MediaMetadataRetriever mmr;
+    private AudioManager mAudioManager;
     private SongBL songBL;
     private String currentSongPath;
     private String currentSongName;
@@ -265,6 +278,7 @@ public class MediaPlayerService extends Service {
         }
         Song song = songBL.fetchNextSong();
         prepareNextSong(song);
+
         buildNotification( generateAction( android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE  ) );
     }
     private void instantHate(){
@@ -302,10 +316,17 @@ public class MediaPlayerService extends Service {
         }
 
     }
+
     private void prepareNextSong(Song song){
         if(song != null && song.name != null && song.name.trim().length() > 0){
             currentSongPath = song.path;
             currentSongName = song.name;
+
+            mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+
+            if (mAudioManager.isBluetoothA2dpOn() && android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                onTrackChanged(song.name);
+            }
 
             if(mMediaPlayer != null && mMediaPlayer.isPlaying()){
                 mMediaPlayer.stop();
@@ -369,6 +390,25 @@ public class MediaPlayerService extends Service {
 
     }
     //endregion
+    private void onTrackChanged(String title) {
+
+        MediaMetadata metadata = new MediaMetadata.Builder()
+                .putString(MediaMetadata.METADATA_KEY_TITLE, title)
+                //.putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
+                //.putString(MediaMetadata.METADATA_KEY_ALBUM, album)
+                //.putLong(MediaMetadata.METADATA_KEY_DURATION, duration)
+                //.putLong(MediaMetadata.METADATA_KEY_TRACK_NUMBER, trackNumber)
+                .build();
+
+        mSession.setMetadata(metadata);
+
+        PlaybackState state = new PlaybackState.Builder()
+                .setActions(PlaybackState.ACTION_PLAY)
+                .setState(PlaybackState.STATE_PLAYING, 0, 1.0f, SystemClock.elapsedRealtime())
+                .build();
+
+        mSession.setPlaybackState(state);
+    }
     private boolean chkSettings(){
         if(!CriteriaBL.chkSettingsFolders()){
             sendResult(getString(R.string.setRootAndTarget));
@@ -403,7 +443,6 @@ public class MediaPlayerService extends Service {
                 e.printStackTrace();
             }
         }
-
         broadcaster.sendBroadcast(intent);
     }
 
@@ -430,4 +469,5 @@ public class MediaPlayerService extends Service {
         timer.schedule(timertask, 0, 1000); // execute in every 15sec
     }
     //endregion
+
 }

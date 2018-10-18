@@ -2,13 +2,13 @@
     <data>
         <variable
             name="playVM"
-            type="com.productiveengine.myl.ViewModels.PlayVM"/>
+            type="com.productiveengine.myl.viewmodels.PlayVM"/>
     </data>
     <FrameLayout
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.productiveengine.myl.UIL.Play">
+        tools:context="com.productiveengine.myl.uil.Play">
 
         <LinearLayout
             android:orientation="vertical"

@@ -1,6 +1,6 @@
 package com.productiveengine.myl;
 
-import com.productiveengine.myl.Common.FileActions;
+import com.productiveengine.myl.common.FileActions;
 
 import org.junit.Test;
 

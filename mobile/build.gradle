@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
+    compileSdkVersion 28
 
     defaultConfig {
         applicationId "com.productiveengine.myl"
         minSdkVersion 21
-        targetSdkVersion 24
-        versionCode 12
-        versionName "1.11"
+        targetSdkVersion 28
+        versionCode 13
+        versionName "1.12"
     }
     buildTypes {
         release {
@@ -32,17 +32,18 @@ android {
 }
 
 repositories {
+    google()
     mavenCentral()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
-    compile project(':app')
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:design:24.2.1'
-    compile 'com.android.support:support-v4:24.2.1'
-    compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
-    testCompile 'junit:junit:4.12'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    testImplementation 'junit:junit:4.12'
+    implementation project(':app')
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:design:28.0.0'
+    implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'com.reactiveandroid:reactiveandroid:1.4.3'
+    testImplementation 'junit:junit:4.12'
 }

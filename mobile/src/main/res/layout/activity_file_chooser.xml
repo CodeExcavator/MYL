@@ -7,7 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.productiveengine.myl.UIL.FileChooser">
+    tools:context="com.productiveengine.myl.uil.FileChooser">
 
     <ListView
         android:id="@+id/dir_list"

@@ -2,13 +2,13 @@
     <data>
         <variable
             name="statsVM"
-            type="com.productiveengine.myl.ViewModels.StatsVM"/>
+            type="com.productiveengine.myl.viewmodels.StatsVM"/>
     </data>
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.productiveengine.myl.UIL.Stats">
+        tools:context="com.productiveengine.myl.uil.Stats">
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
